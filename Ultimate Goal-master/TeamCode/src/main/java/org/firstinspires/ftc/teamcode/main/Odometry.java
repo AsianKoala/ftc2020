@@ -6,29 +6,26 @@ import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
-import org.openftc.revextensions2.RevBulkData;
-
 import java.util.Arrays;
 
 
 public class Odometry {
-    public static double PARALLEL_TICKS_PER_INCH = 1111.587;
-    public static double LATERAL_TICKS_PER_INCH = 1111.587;
-    public static int VELOCITY_READ_TICKS = 5;
+    // 8192 ticks per revolution
+    // wheels are 60mm, or 2.3622 inches diameter
+    // 2.3622 * pi = 7.42107016631 circumference
+    // 8192 / 7.42107016631 = ticks per inch
+    // 1103.88391653 ticks per inch
+    public static final double TICKS_PER_INCH = 1103.8839;
+    public static final double PARALLEL_Y_POS = -5.728;
+    public static final double LATERAL_X_POS = -6.944;
 
-    public static int PARALLEL_ENCODER_PORT = 0;
-    public static int LATERAL_ENCODER_PORT = 1;
+    private DecompositionSolver forwardSolver;
 
-    public static double PARALLEL_Y_POS = -5.728;
-    public static double LATERAL_X_POS = -6.944;
+    private int prevParallel;
+    private int prevLateral;
+    private double prevHeading;
 
-    DecompositionSolver forwardSolver;
-
-    int[] prevWheelPositions;
-    double prevHeading;
-
-    // External interfaces
-    public Pose currentPosition;
+    private Pose currentPosition;
     public Pose relativeRobotMovement;
 
     public Odometry() {
@@ -60,7 +57,8 @@ public class Odometry {
             throw new IllegalArgumentException("The specified configuration cannot support full localization");
         }
 
-        prevWheelPositions = new int[2]; // Initializes with zeros
+        prevLateral = 0;
+        prevParallel = 0;
 
         currentPosition = new Pose(start.x, start.y, start.heading);
         relativeRobotMovement = new Pose(0, 0, 0);
@@ -70,22 +68,18 @@ public class Odometry {
         return ticks / ticksPerInch;
     }
 
-    public static int inchesToEncoderTicks(double inches) {
-        return (int) (inches * PARALLEL_TICKS_PER_INCH);
-    }
-
-    public void update(RevBulkData data, double heading) {
+    public void update(int parallel_ticks, int lateral_ticks, double heading) {
         double[] deltas = new double[] {
-                encoderTicksToInches(data.getMotorCurrentPosition(PARALLEL_ENCODER_PORT) - prevWheelPositions[0],
-                        PARALLEL_TICKS_PER_INCH),
-                encoderTicksToInches(data.getMotorCurrentPosition(LATERAL_ENCODER_PORT) - prevWheelPositions[1],
-                        LATERAL_TICKS_PER_INCH),
+                encoderTicksToInches(parallel_ticks - prevParallel,
+                        TICKS_PER_INCH),
+                encoderTicksToInches(lateral_ticks - prevLateral,
+                        TICKS_PER_INCH),
                 MathUtil.angleWrap(heading - prevHeading)
         };
         System.out.println(Arrays.toString(deltas));
-        prevWheelPositions[0] = data.getMotorCurrentPosition(PARALLEL_ENCODER_PORT);
+        prevParallel = parallel_ticks;
+        prevLateral = lateral_ticks;
         prevHeading = heading;
-        prevWheelPositions[1] = data.getMotorCurrentPosition(LATERAL_ENCODER_PORT);
         updateFromRelative(deltas);
     }
 
@@ -106,10 +100,12 @@ public class Odometry {
 
     public double x() { return currentPosition.x; }
     public double y() { return currentPosition.y; }
-    public double h() { return currentPosition.heading; }
+    public double heading() { return currentPosition.heading; }
     public Pose pose() {
-        return new Pose(currentPosition.x, currentPosition.y, currentPosition.heading);
+        return currentPosition;
     }
 
-
+    public String toString() {
+        return pose().toString();
+    }
 }

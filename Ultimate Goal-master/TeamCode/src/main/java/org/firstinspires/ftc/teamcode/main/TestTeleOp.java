@@ -13,8 +13,14 @@ import org.openftc.revextensions2.ExpansionHubMotor;
 public class TestTeleOp extends OpMode {
 
     DriveTrain driveTrain;
-    ExpansionHubMotor leftIntake, rightIntake;
+    ExpansionHubMotor leftIntake, rightIntake; // also used for odom shit
+
+    // odom shit
     BNO055IMU imu;
+    double headingOffset;
+    double lastHeading;
+    Odometry odometry;
+
 
     @Override
     public void init() {
@@ -28,16 +34,20 @@ public class TestTeleOp extends OpMode {
 
         leftIntake = hardwareMap.get(ExpansionHubMotor.class, "leftIntake");
         rightIntake = hardwareMap.get(ExpansionHubMotor.class, "rightIntake");
+        odometry = new Odometry();
+        initBNO055IMU(hardwareMap);
     }
 
     @Override
     public void loop() {
         controlMovement();
         driveTrain.update();
+
+        lastHeading = imu.getAngularOrientation().firstAngle - headingOffset;
+        odometry.update(leftIntake.getCurrentPosition(), rightIntake.getCurrentPosition(), lastHeading);
+
         telemetry.addLine();
-        telemetry.addData("x", DriveTrain.movementX);
-        telemetry.addData("y", DriveTrain.movementY);
-        telemetry.addData("turn", DriveTrain.movementTurn);
+        telemetry.addLine(odometry.toString());
         telemetry.update();
     }
 
@@ -52,7 +62,7 @@ public class TestTeleOp extends OpMode {
     }
 
     private void initBNO055IMU(HardwareMap hardwareMap) {
-        imu = hardwareMap.get(BNO055IMUImpl.class, "imu");
+        imu = hardwareMap.get(BNO055IMUImpl.class, "imu"); // @TODO find out correct axes
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         parameters.loggingEnabled  = false;

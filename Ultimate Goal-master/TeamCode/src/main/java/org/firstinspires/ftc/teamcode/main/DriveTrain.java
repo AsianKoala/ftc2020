@@ -58,10 +58,10 @@ public class DriveTrain extends Hardware {
     @Override
     public void update() {
         applyMovement();
-        parentOpMode.telemetry.addData("frontLeft power", frontLeft.getPower());
-        parentOpMode.telemetry.addData("frontRight power", frontRight.getPower());
-        parentOpMode.telemetry.addData("backLeft power", backLeft.getPower());
-        parentOpMode.telemetry.addData("backRight power", backRight.getPower());
+//        parentOpMode.telemetry.addData("frontLeft power", frontLeft.getPower());
+//        parentOpMode.telemetry.addData("frontRight power", frontRight.getPower());
+//        parentOpMode.telemetry.addData("backLeft power", backLeft.getPower());
+//        parentOpMode.telemetry.addData("backRight power", backRight.getPower());
     }
 
 }

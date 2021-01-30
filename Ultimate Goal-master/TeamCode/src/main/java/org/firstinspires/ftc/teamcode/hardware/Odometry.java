@@ -12,6 +12,10 @@ import java.util.Arrays;
 
 
 public class Odometry {
+    public static double currX;
+    public static double currY;
+    public static double currHeading;
+    public static Pose currPose;
     // 8192 ticks per revolution
     // wheels are 60mm, or 2.3622 inches diameter
     // 2.3622 * pi = 7.42107016631 circumference
@@ -63,6 +67,7 @@ public class Odometry {
 
         currentPosition = new Pose(start.x, start.y, start.heading);
         relativeRobotMovement = new Pose(0, 0, 0);
+        updateValues();
     }
 
     public static double encoderTicksToInches(int ticks, double ticksPerInch) {
@@ -97,17 +102,19 @@ public class Odometry {
 
         relativeRobotMovement = relativeRobotMovement.add(robotPoseDelta);
         currentPosition = MathUtil.relativeOdometryUpdate(currentPosition, robotPoseDelta);
+        updateValues();
     }
 
-    public double x() { return currentPosition.x; }
-    public double y() { return currentPosition.y; }
-    public double heading() { return currentPosition.heading; }
-    public Pose pose() {
-        return currentPosition;
+    private void updateValues() {
+        currX = currentPosition.x;
+        currY = currentPosition.y;
+        currHeading = currentPosition.heading;
+        currPose = currentPosition;
     }
+
 
     public String toString() {
         String newLine = System.getProperty("line.separator");
-        return "x: " + x() + newLine + "y: " + y() + newLine + "heading: " + Math.toDegrees(heading());
+        return "x: " + currX + newLine + "y: " + currY + newLine + "heading: " + Math.toDegrees(currHeading);
     }
 }

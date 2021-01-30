@@ -5,6 +5,8 @@ import org.apache.commons.math3.linear.DecompositionSolver;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
+import org.firstinspires.ftc.teamcode.main.util.MathUtil;
+import org.firstinspires.ftc.teamcode.main.util.Pose;
 
 import java.util.Arrays;
 
@@ -28,11 +30,13 @@ public class Odometry {
     private Pose currentPosition;
     public Pose relativeRobotMovement;
 
-    public Odometry() {
-        this(new Pose(0, 0, 0));
+    private OdometrySet odometrySet;
+
+    public Odometry(OdometrySet odometrySet) {
+        this(new Pose(0, 0, 0), odometrySet);
     }
 
-    public Odometry(Pose start) {
+    public Odometry(Pose start, OdometrySet odometrySet) {
         Array2DRowRealMatrix inverseMatrix = new Array2DRowRealMatrix(3, 3);
 
         EncoderWheel[] WHEELS = {
@@ -53,12 +57,9 @@ public class Odometry {
 
         forwardSolver = new LUDecomposition(inverseMatrix).getSolver();
 
-        if (!forwardSolver.isNonSingular()) {
-            throw new IllegalArgumentException("The specified configuration cannot support full localization");
-        }
-
         prevLateral = 0;
         prevParallel = 0;
+        this.odometrySet = odometrySet;
 
         currentPosition = new Pose(start.x, start.y, start.heading);
         relativeRobotMovement = new Pose(0, 0, 0);
@@ -68,17 +69,17 @@ public class Odometry {
         return ticks / ticksPerInch;
     }
 
-    public void update(int parallel_ticks, int lateral_ticks, double heading) {
+    public void update(double heading) {
         double[] deltas = new double[] {
-                encoderTicksToInches(parallel_ticks - prevParallel,
+                encoderTicksToInches(odometrySet.getParallelTicks() - prevParallel,
                         TICKS_PER_INCH),
-                encoderTicksToInches(lateral_ticks - prevLateral,
+                encoderTicksToInches(odometrySet.getLateralTicks() - prevLateral,
                         TICKS_PER_INCH),
                 MathUtil.angleWrap(heading - prevHeading)
         };
         System.out.println(Arrays.toString(deltas));
-        prevParallel = parallel_ticks;
-        prevLateral = lateral_ticks;
+        prevParallel = odometrySet.getParallelTicks();
+        prevLateral = odometrySet.getLateralTicks();
         prevHeading = heading;
         updateFromRelative(deltas);
     }
@@ -106,6 +107,7 @@ public class Odometry {
     }
 
     public String toString() {
-        return pose().toString();
+        String newLine = System.getProperty("line.separator");
+        return "x: " + x() + newLine + "y: " + y() + newLine + "heading: " + Math.toDegrees(heading());
     }
 }

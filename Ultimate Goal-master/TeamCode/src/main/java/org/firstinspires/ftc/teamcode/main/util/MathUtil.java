@@ -1,24 +1,21 @@
-package org.firstinspires.ftc.teamcode.main;
+package org.firstinspires.ftc.teamcode.main.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 public class MathUtil {
     public static final double EPSILON = 1e-6;
 
-    public static double angleWrap(double angle) {
-        double negTauToTau = angle % (Math.PI * 2);
-
-        if (Math.abs(negTauToTau) > Math.PI) {
-            negTauToTau -= Math.copySign(Math.PI * 2, negTauToTau);
+    public static double angleWrap(double angle){
+        while (angle<-Math.PI){
+            angle += 2*Math.PI;
         }
-        return negTauToTau;
+        while (angle>Math.PI){
+            angle -= 2*Math.PI;
+        }
+        return angle;
     }
+
     public static double clamp(double d) {
         return Math.min(Math.max(d, -1), 1);
     }

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.main;
+package org.firstinspires.ftc.teamcode.main.util;
 
 public class Pose extends Point implements Cloneable {
     public double heading;

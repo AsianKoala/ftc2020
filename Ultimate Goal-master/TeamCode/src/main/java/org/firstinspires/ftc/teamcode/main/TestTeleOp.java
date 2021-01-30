@@ -7,24 +7,32 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.teamcode.main.util.AxesSigns;
+import org.firstinspires.ftc.teamcode.main.util.BNO055IMUUtil;
+import org.firstinspires.ftc.teamcode.main.util.Pose;
 import org.openftc.revextensions2.ExpansionHubMotor;
+
+import static org.firstinspires.ftc.teamcode.main.util.MathUtil.angleWrap;
 
 @TeleOp
 public class TestTeleOp extends OpMode {
 
-    DriveTrain driveTrain;
-    ExpansionHubMotor leftIntake, rightIntake; // also used for odom shit
+    public DriveTrain driveTrain;
 
     // odom shit
-    BNO055IMU imu;
-    double headingOffset;
-    double lastHeading;
-    Odometry odometry;
+    public Odometry odometry;
+    public OdometrySet odometrySet;
+    private BNO055IMU imu;
+    private double headingOffset;
+    private double lastHeading;
+
+    public final Pose startPose = new Pose(25, 25, 0);
 
 
     @Override
     public void init() {
         Hardware.loadParentOpMode(this);
+
         ExpansionHubMotor frontLeft, frontRight, backLeft, backRight;
         frontLeft = hardwareMap.get(ExpansionHubMotor.class, "FL");
         frontRight = hardwareMap.get(ExpansionHubMotor.class, "FR");
@@ -32,9 +40,10 @@ public class TestTeleOp extends OpMode {
         backRight = hardwareMap.get(ExpansionHubMotor.class, "BR");
         driveTrain = new DriveTrain(frontLeft, backLeft, frontRight, backRight);
 
-        leftIntake = hardwareMap.get(ExpansionHubMotor.class, "leftIntake");
-        rightIntake = hardwareMap.get(ExpansionHubMotor.class, "rightIntake");
-        odometry = new Odometry();
+        ExpansionHubMotor parallelOdometer = hardwareMap.get(ExpansionHubMotor.class, "leftIntake");
+        ExpansionHubMotor lateralOdometer = hardwareMap.get(ExpansionHubMotor.class, "rightIntake");
+        odometrySet = new OdometrySet(parallelOdometer, lateralOdometer);
+        odometry = new Odometry(startPose, odometrySet);
         initBNO055IMU(hardwareMap);
     }
 
@@ -44,7 +53,7 @@ public class TestTeleOp extends OpMode {
         driveTrain.update();
 
         lastHeading = imu.getAngularOrientation().firstAngle - headingOffset;
-        odometry.update(leftIntake.getCurrentPosition(), rightIntake.getCurrentPosition(), lastHeading);
+        odometry.update(angleWrap(lastHeading));
 
         telemetry.addLine();
         telemetry.addLine(odometry.toString());
@@ -62,7 +71,7 @@ public class TestTeleOp extends OpMode {
     }
 
     private void initBNO055IMU(HardwareMap hardwareMap) {
-        imu = hardwareMap.get(BNO055IMUImpl.class, "imu"); // @TODO find out correct axes
+        imu = hardwareMap.get(BNO055IMUImpl.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         parameters.loggingEnabled  = false;

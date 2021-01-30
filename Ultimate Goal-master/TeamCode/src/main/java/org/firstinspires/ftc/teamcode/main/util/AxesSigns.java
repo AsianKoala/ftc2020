@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.main;
+package org.firstinspires.ftc.teamcode.main.util;
 
 /**
  * IMU axes signs in the order XYZ (after remapping).

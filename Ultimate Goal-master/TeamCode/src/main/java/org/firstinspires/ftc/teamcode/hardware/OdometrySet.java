@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.main;
+package org.firstinspires.ftc.teamcode.hardware;
 
 import org.openftc.revextensions2.ExpansionHubMotor;
 

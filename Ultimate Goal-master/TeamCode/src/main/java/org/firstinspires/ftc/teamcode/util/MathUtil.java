@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.main.util;
+package org.firstinspires.ftc.teamcode.util;
 
 import java.util.LinkedList;
 import java.util.List;

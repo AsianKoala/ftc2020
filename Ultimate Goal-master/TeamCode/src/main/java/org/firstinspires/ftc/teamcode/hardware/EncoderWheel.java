@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.main;
+package org.firstinspires.ftc.teamcode.hardware;
 
 public class EncoderWheel {
     public double x, y, heading;

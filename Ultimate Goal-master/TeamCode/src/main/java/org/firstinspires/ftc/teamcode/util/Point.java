@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.main.util;
+package org.firstinspires.ftc.teamcode.util;
 
 public class Point implements Comparable, Cloneable {
     public double x;

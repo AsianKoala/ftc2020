@@ -1,20 +1,23 @@
-package org.firstinspires.ftc.teamcode.main;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.BNO055IMUImpl;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import net.frogbots.ftcopmodetunercommon.opmode.TunableOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.teamcode.main.util.AxesSigns;
-import org.firstinspires.ftc.teamcode.main.util.BNO055IMUUtil;
-import org.firstinspires.ftc.teamcode.main.util.Pose;
+import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
+import org.firstinspires.ftc.teamcode.hardware.Hardware;
+import org.firstinspires.ftc.teamcode.hardware.Odometry;
+import org.firstinspires.ftc.teamcode.hardware.OdometrySet;
+import org.firstinspires.ftc.teamcode.util.AxesSigns;
+import org.firstinspires.ftc.teamcode.util.BNO055IMUUtil;
+import org.firstinspires.ftc.teamcode.util.Pose;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
-import static org.firstinspires.ftc.teamcode.main.util.MathUtil.angleWrap;
+import static org.firstinspires.ftc.teamcode.util.MathUtil.angleWrap;
 
 @TeleOp
 public class Robot extends TunableOpMode {
@@ -50,7 +53,6 @@ public class Robot extends TunableOpMode {
 
     @Override
     public void loop() {
-        controlMovement();
         driveTrain.update();
 
         lastHeading = imu.getAngularOrientation().firstAngle - headingOffset;
@@ -62,14 +64,6 @@ public class Robot extends TunableOpMode {
     }
 
 
-
-    public void controlMovement() {
-        double masterScale = 0.5 + ((gamepad1.right_bumper ? 1 : 0) * (1.0-0.5));
-        DriveTrain.movementY = -gamepad1.left_stick_y * masterScale;// * getDouble("y_move_scale");
-        DriveTrain.movementX = gamepad1.left_stick_x * masterScale;// * getDouble("x_move_scale");
-        DriveTrain.movementTurn = -gamepad1.right_stick_x * masterScale;// * getDouble ("rot_move_scale");
-
-    }
 
     private void initBNO055IMU(HardwareMap hardwareMap) {
         imu = hardwareMap.get(BNO055IMUImpl.class, "imu");

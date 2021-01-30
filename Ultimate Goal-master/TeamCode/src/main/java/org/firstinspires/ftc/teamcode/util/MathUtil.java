@@ -1,7 +1,8 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
+import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
 
 public class MathUtil {
     public static final double EPSILON = 1e-6;
@@ -71,47 +72,89 @@ public class MathUtil {
         }
     }
 
-    public static Point lineSegmentCircleIntersection(Point ul1, Point ul2, Point o, double radius) {
-        Point l1 = new Point(ul1.x - o.x, ul1.y - o.y);
-        Point l2 = new Point(ul2.x - o.x, ul2.y - o.y);
 
-        double d_x = l2.x - l1.x;
-        double d_y = l2.y - l1.y;
-        double d_r = Math.hypot(d_x, d_y);
-        double determinant = l1.x * l2.y - l2.x * l1.y;
-        double discriminant = Math.pow(radius, 2) * Math.pow(d_r, 2) - Math.pow(determinant, 2);
-
-        List<Point> offsets = new LinkedList<>();
-        if (MathUtil.approxEquals(discriminant, 0)) {
-            offsets.add(new Point(0, 0));
-        } else if (discriminant > 0) {
-            double x_determinant = sgn(d_y) * d_x * Math.sqrt(discriminant);
-            double y_determinant = Math.abs(d_y) * Math.sqrt(discriminant);
-            offsets.add(new Point(x_determinant, y_determinant));
-            offsets.add(new Point(-x_determinant, -y_determinant));
+    /**
+     * Finds the intersection of a line segment and a circle
+     * @param circleX x position of the circle
+     * @param circleY y position of the circle
+     * @param r: radius of the circle
+     * @param lineX1 first x position of the line
+     * @param lineY1 first y position of the line
+     * @param lineX2 second x position of the line
+     * @param lineY2 second y position of the line
+     * @return an Array of intersections
+     */
+    public static ArrayList<Point> lineCircleIntersection(double circleX, double circleY, double r,
+                                                          double lineX1, double lineY1,
+                                                          double lineX2, double lineY2){
+        //make sure the points don't exactly line up so the slopes work
+        if(Math.abs(lineY1- lineY2) < 0.003){
+            lineY1 = lineY2 + 0.003;
+        }
+        if(Math.abs(lineX1- lineX2) < 0.003){
+            lineX1 = lineX2 + 0.003;
         }
 
-        List<Point> intersections = new LinkedList<>();
-        for (Point offset : offsets) {
-            intersections.add(new Point (
-                    (determinant * d_y + offset.x) / Math.pow(d_r, 2) + o.x,
-                    (-determinant * d_x + offset.y) / Math.pow(d_r, 2) + o.y
-            ));
-        }
+        //calculate the slope of the line
+        double m1 = (lineY2 - lineY1)/(lineX2-lineX1);
 
-        // Sort points by closeness to ul2 so closest point is at position 0
-        if (intersections.size() == 2 &&
-                (intersections.get(0).distance(ul2) > intersections.get(1).distance(ul2))) {
-            // If it's unsorted, reverse the order
-            intersections.add(intersections.remove(0));
-        }
+        //the first coefficient in the quadratic
+        double quadraticA = 1.0 + pow(m1,2);
 
-        if (intersections.size() > 0) {
-            return intersections.get(0);
-        } else {
-            return null;
+        //shift one of the line's points so it is relative to the circle
+        double x1 = lineX1-circleX;
+        double y1 = lineY1-circleY;
+
+
+        //the second coefficient in the quadratic
+        double quadraticB = (2.0 * m1 * y1) - (2.0 * pow(m1,2) * x1);
+
+        //the third coefficient in the quadratic
+        double quadraticC = ((pow(m1,2)*pow(x1,2)) - (2.0*y1*m1*x1) + pow(y1,2)-pow(r,2));
+
+
+        ArrayList<Point> allPoints = new ArrayList<>();
+
+
+
+        //this may give an error so we use a try catch
+        try{
+            //now solve the quadratic equation given the coefficients
+            double xRoot1 = (-quadraticB + sqrt(pow(quadraticB,2) - (4.0 * quadraticA * quadraticC)))/(2.0*quadraticA);
+
+            //we know the line equation so plug into that to get root
+            double yRoot1 = m1 * (xRoot1 - x1) + y1;
+
+
+            //now we can add back in translations
+            xRoot1 += circleX;
+            yRoot1 += circleY;
+
+            //make sure it was within range of the segment
+            double minX = Math.min(lineX1, lineX2);
+            double maxX = Math.max(lineX1, lineX2);
+            if(xRoot1 > minX && xRoot1 < maxX){
+                allPoints.add(new Point(xRoot1,yRoot1));
+            }
+
+            //do the same for the other root
+            double xRoot2 = (-quadraticB - sqrt(pow(quadraticB,2) - (4.0 * quadraticA * quadraticC)))/(2.0*quadraticA);
+
+            double yRoot2 = m1 * (xRoot2 - x1) + y1;
+            //now we can add back in translations
+            xRoot2 += circleX;
+            yRoot2 += circleY;
+
+            //make sure it was within range of the segment
+            if(xRoot2 > minX && xRoot2 < maxX){
+                allPoints.add(new Point(xRoot2,yRoot2));
+            }
+        }catch(Exception e){
+            //if there are no roots
         }
+        return allPoints;
     }
+
 
     private static int sgn(double n) {
         return n < 0 ? -1 : 1;

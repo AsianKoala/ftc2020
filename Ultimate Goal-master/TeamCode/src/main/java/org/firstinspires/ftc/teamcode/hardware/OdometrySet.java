@@ -14,8 +14,8 @@ public class OdometrySet {
     }
 
     public void markCurrOffset() {
-        verticalOffset += vertical.getCurrentPosition();
-        horizontalOffset += horizontal.getCurrentPosition();
+        verticalOffset = vertical.getCurrentPosition();
+        horizontalOffset = horizontal.getCurrentPosition();
     }
 
     public int getVerticalTicks() {

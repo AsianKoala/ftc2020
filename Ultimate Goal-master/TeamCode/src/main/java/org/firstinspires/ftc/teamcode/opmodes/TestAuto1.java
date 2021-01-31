@@ -83,6 +83,9 @@ public class TestAuto1 extends MainAuto {
             Pose targetPose = new Pose(12, 12, 0);
             PPController.goToPosition(targetPose.x, targetPose.y, 0.5);
             telemetry.addLine("Diff is currently: " + worldPose.distanceBetween(targetPose));
+
+            if(worldPose.distanceBetween(targetPose) < 2)
+                DriveTrain.stopMovement();
         }
 
         if(progStage == progStages.stop.ordinal()) {

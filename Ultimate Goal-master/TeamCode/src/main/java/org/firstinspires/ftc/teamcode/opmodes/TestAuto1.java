@@ -10,22 +10,23 @@ import org.firstinspires.ftc.teamcode.util.Pose;
 @Autonomous
 public class TestAuto1 extends MainAuto {
 
+    Pose startPose = new Pose(0, 0, 0);
+
     public enum progStages {
         driveForward,
         turn,
-        driveForwardAgain
+        stop
     }
 
     @Override
     public void init() {
         super.init();
-        odometry.setStartPosition(new Pose(25, 25, 0));
+        odometry.setStartPosition(startPose);
     }
 
     @Override
     public void start() {
         super.start();
-
         setStage(progStages.turn.ordinal());
     }
 
@@ -53,18 +54,21 @@ public class TestAuto1 extends MainAuto {
 
         if(progStage == progStages.turn.ordinal()) {
             if(stageFinished) {
-                requestOpModeStop();
+                initProgVars();
             }
 
-            DriveTrain.movementTurn = 0.5;
+            DriveTrain.movementTurn = 0.3;
             telemetry.addLine("Currently on stage: " + progStages.turn.name());
-            telemetry.addLine("Diff is currently: " + Math.abs(Math.toDegrees(MathUtil.angleWrap(startStageHeading - Odometry.currHeading))));
-            telemetry.addLine("current heading in deg: " + Math.toDegrees(Odometry.currHeading));
-            telemetry.addLine("start heading in deg: " + Math.toDegrees(startStageHeading));
-            if(Math.abs(Math.toDegrees(MathUtil.angleWrap(startStageHeading - Odometry.currHeading))) > 45) {
+            telemetry.addLine("Diff is currently: " + (Math.abs(Math.toDegrees(MathUtil.angleWrap(startPose.heading - Odometry.currHeading))) > 45));
+            telemetry.addLine("Diff is currently: " + Math.abs(Math.toDegrees(MathUtil.angleWrap(startPose.heading - Odometry.currHeading))));
+            if(Math.abs(Math.toDegrees(MathUtil.angleWrap(startPose.heading - Odometry.currHeading))) > 45) {
                 DriveTrain.stopMovement();
                 nextStage();
             }
+        }
+
+        if(progStage == progStages.stop.ordinal()) {
+            requestOpModeStop();
         }
     }
 }

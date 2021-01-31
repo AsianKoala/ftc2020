@@ -13,7 +13,7 @@ public class Pose extends Point implements Cloneable {
     }
 
     public Pose add(Pose p2) {
-        return new Pose(x + p2.x, y + p2.y, heading + p2.heading);
+        return new Pose(x + p2.x, y + p2.y, MathUtil.angleWrap(heading + p2.heading ));
     }
     public Pose multiply(Pose p2) {
         return new Pose(x * p2.x, y * p2.y, heading * p2.heading);

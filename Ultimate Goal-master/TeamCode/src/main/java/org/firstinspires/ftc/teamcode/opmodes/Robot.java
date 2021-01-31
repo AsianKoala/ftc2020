@@ -19,7 +19,7 @@ import org.openftc.revextensions2.ExpansionHubMotor;
 
 import static org.firstinspires.ftc.teamcode.util.MathUtil.angleWrap;
 
-@TeleOp
+
 public class Robot extends TunableOpMode {
 
     public DriveTrain driveTrain;
@@ -46,7 +46,7 @@ public class Robot extends TunableOpMode {
 
         ExpansionHubMotor parallelOdometer = hardwareMap.get(ExpansionHubMotor.class, "leftIntake");
         ExpansionHubMotor lateralOdometer = hardwareMap.get(ExpansionHubMotor.class, "rightIntake");
-        odometrySet = new OdometrySet(parallelOdometer, lateralOdometer);
+        odometrySet = new OdometrySet(lateralOdometer, parallelOdometer);
         odometry = new Odometry(startPose, odometrySet);
         initBNO055IMU(hardwareMap);
     }
@@ -60,7 +60,6 @@ public class Robot extends TunableOpMode {
 
         telemetry.addLine();
         telemetry.addLine(odometry.toString());
-        telemetry.update();
     }
 
 

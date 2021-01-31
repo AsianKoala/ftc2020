@@ -4,10 +4,11 @@ import org.firstinspires.ftc.teamcode.hardware.Odometry;
 import org.firstinspires.ftc.teamcode.movement.PPController;
 import org.firstinspires.ftc.teamcode.util.Pose;
 
-public abstract class MainAuto extends Robot {
+public class MainAuto extends Robot {
 
-    private int progStage;
-    private boolean stageFinished;
+    public int progStage;
+    public boolean stageFinished;
+    public int completedStages;
 
     public void setStage(int stage) {
         progStage = stage;
@@ -16,15 +17,9 @@ public abstract class MainAuto extends Robot {
 
     public void nextStage() {
         setStage(progStage + 1);
+        completedStages++;
     }
 
-    public int getCurrStage() {
-        return progStage;
-    }
-
-    public boolean isStageFinished() {
-        return stageFinished;
-    }
 
     protected double startStageX;
     protected double startStageY;
@@ -46,7 +41,8 @@ public abstract class MainAuto extends Robot {
     @Override
     public void start() {
         progStage = 0;
-        stageFinished = false;
+        completedStages = 0;
+        stageFinished = true;
     }
 
     @Override
@@ -55,5 +51,7 @@ public abstract class MainAuto extends Robot {
         MainStateMachine();
     }
 
-    abstract void MainStateMachine();
+    public void MainStateMachine() {
+
+    }
 }

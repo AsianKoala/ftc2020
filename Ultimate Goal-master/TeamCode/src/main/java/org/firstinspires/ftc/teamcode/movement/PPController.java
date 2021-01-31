@@ -2,8 +2,10 @@ package org.firstinspires.ftc.teamcode.movement;
 
 import com.qualcomm.robotcore.util.Range;
 
+import org.apache.commons.math3.analysis.integration.IterativeLegendreGaussIntegrator;
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.hardware.Odometry;
+import org.firstinspires.ftc.teamcode.opmodes.MainAuto;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
 import org.firstinspires.ftc.teamcode.util.Point;
 
@@ -30,69 +32,135 @@ public class PPController {
     private static profileStates turn_movement_state = profileStates.gunningIt;
 
 
-    public static void goToPosition(double targetX, double targetY, double point_angle, double movement_speed, double point_speed) {
-        //get our distance away from the point
-        double distanceToPoint = Math.sqrt(Math.pow(targetX- Odometry.currX, 2) + Math.pow(targetY-Odometry.currY,2));
 
-        double angleToPoint = Math.atan2(targetY-Odometry.currY, targetX-Odometry.currX);
-        double deltaAngleToPoint = MathUtil.angleWrap(angleToPoint-(Odometry.currHeading-Math.toRadians(90)));
-        //x and y components required to move toward the next point (with angle correction)
-        double relative_x_to_point = Math.cos(deltaAngleToPoint) * distanceToPoint;
-        double relative_y_to_point = Math.sin(deltaAngleToPoint) * distanceToPoint;
+    public static double movement_y_min = 0.091;
+    public static double movement_x_min = 0.11;
+    public static double movement_turn_min = 0.10;
 
-        double relative_abs_x = Math.abs(relative_x_to_point);
-        double relative_abs_y = Math.abs(relative_y_to_point);
-
-
-
-        //preserve the shape (ratios) of our intended movement direction but scale it by movement_speed
-        double movement_x_power = (relative_x_to_point / (relative_abs_y+relative_abs_x)) * movement_speed;
-        double movement_y_power = (relative_y_to_point / (relative_abs_y+relative_abs_x)) * movement_speed;
-
-        //every movement has two states, the fast "gunning" section and the slow refining part. turn this var off when close to target
-        if(y_movement_state == profileStates.gunningIt) {
-            if(relative_abs_y < 3){
-                y_movement_state = y_movement_state.next();
+    private static void allComponentsMinPower() {
+        if(Math.abs(DriveTrain.movementX) > Math.abs(DriveTrain.movementY)){
+            if(Math.abs(DriveTrain.movementX) > Math.abs(DriveTrain.movementTurn)){
+                DriveTrain.movementX = minPower(DriveTrain.movementX,movement_x_min);
+            }else{
+                DriveTrain.movementTurn = minPower(DriveTrain.movementTurn,movement_turn_min);
+            }
+        }else{
+            if(Math.abs(DriveTrain.movementY) > Math.abs(DriveTrain.movementTurn)){
+                DriveTrain.movementY = minPower(DriveTrain.movementY, movement_y_min);
+            }else{
+                DriveTrain.movementTurn = minPower(DriveTrain.movementTurn,movement_turn_min);
             }
         }
+    }
 
-
-        if(y_movement_state == profileStates.fineAdjustment){
-            movement_y_power = Range.clip(((relative_y_to_point/8.0) * 0.15),-0.15,0.15);
+    public static double minPower(double val, double min){
+        if(val >= 0 && val <= min){
+            return min;
         }
-
-        if(x_movement_state == profileStates.gunningIt) {
-            if(relative_abs_x < 3){
-                x_movement_state = x_movement_state.next();
-            }
+        if(val < 0 && val > -min){
+            return -min;
         }
-
-        if(x_movement_state == profileStates.fineAdjustment){
-            movement_x_power = Range.clip(((relative_x_to_point/2.5) * smallAdjustSpeed),-smallAdjustSpeed,smallAdjustSpeed);
-        }
-
-        double rad_to_target = MathUtil.angleWrap(point_angle-Odometry.currHeading);
-        double turnPower = 0;
-
-        //every movement has two states, the fast "gunning" section and the slow refining part. turn this var off when close to target
-        if(turn_movement_state == profileStates.gunningIt) {
-            turnPower = rad_to_target > 0 ? point_speed : -point_speed;
-            if(Math.abs(rad_to_target) < Math.toRadians(3.0)){
-                turn_movement_state = turn_movement_state.next();
-            }
-
-        }
+        return val;
+    }
 
 
-        if(turn_movement_state == profileStates.fineAdjustment){
-            //this is a var that will go from 0 to 1 in the course of 10 degrees from the target
-            turnPower = (rad_to_target/Math.toRadians(10)) * smallAdjustSpeed;
-            turnPower = Range.clip(turnPower,-smallAdjustSpeed,smallAdjustSpeed);
-        }
 
-        DriveTrain.movementTurn = turnPower;
-        DriveTrain.movementX = movement_x_power;
-        DriveTrain.movementY = movement_y_power;
+//    public static void goToPosition(double targetX, double targetY, double point_angle, double movement_speed, double point_speed, MainAuto opMode) {
+//        //get our distance away from the point
+//        double distanceToPoint = Math.hypot(targetX - Odometry.currX, targetY - Odometry.currY);
+//
+//        double angleToPoint = Math.atan2(targetY-Odometry.currY, targetX-Odometry.currX);
+//        double deltaAngleToPoint = MathUtil.angleWrap(angleToPoint-(Odometry.currHeading-Math.toRadians(90)));
+//        //x and y components required to move toward the next point (with angle correction)
+//        double relative_x_to_point = Math.cos(deltaAngleToPoint) * distanceToPoint;
+//        double relative_y_to_point = Math.sin(deltaAngleToPoint) * distanceToPoint;
+//
+//        double relative_abs_x = Math.abs(relative_x_to_point);
+//        double relative_abs_y = Math.abs(relative_y_to_point);
+//
+//
+//
+//        //preserve the shape (ratios) of our intended movement direction but scale it by movement_speed
+//        double movement_x_power = (relative_x_to_point / (relative_abs_y+relative_abs_x)) * movement_speed;
+//        double movement_y_power = (relative_y_to_point / (relative_abs_y+relative_abs_x)) * movement_speed;
+//
+//        //every movement has two states, the fast "gunning" section and the slow refining part. turn this var off when close to target
+//        if(y_movement_state == profileStates.gunningIt) {
+//            if(relative_abs_y < 3){
+//                y_movement_state = y_movement_state.next();
+//            }
+//        }
+//
+//
+//        if(y_movement_state == profileStates.fineAdjustment){
+//            movement_y_power = Range.clip(((relative_y_to_point/8.0) * 0.15),-0.15,0.15);
+//        }
+//
+//        if(x_movement_state == profileStates.gunningIt) {
+//            if(relative_abs_x < 3){
+//                x_movement_state = x_movement_state.next();
+//            }
+//        }
+//
+//        if(x_movement_state == profileStates.fineAdjustment){
+//            movement_x_power = Range.clip(((relative_x_to_point/2.5) * smallAdjustSpeed),-smallAdjustSpeed,smallAdjustSpeed);
+//        }
+//
+//        double rad_to_target = MathUtil.angleWrap(point_angle-Odometry.currHeading);
+//        double turnPower = 0;
+//
+//        //every movement has two states, the fast "gunning" section and the slow refining part. turn this var off when close to target
+//        if(turn_movement_state == profileStates.gunningIt) {
+//            turnPower = rad_to_target > 0 ? point_speed : -point_speed;
+//            if(Math.abs(rad_to_target) < Math.toRadians(3.0)){
+//                turn_movement_state = turn_movement_state.next();
+//            }
+//
+//        }
+//
+//
+//        if(turn_movement_state == profileStates.fineAdjustment){
+//            //this is a var that will go from 0 to 1 in the course of 10 degrees from the target
+//            turnPower = (rad_to_target/Math.toRadians(10)) * smallAdjustSpeed;
+//            turnPower = Range.clip(turnPower,-smallAdjustSpeed,smallAdjustSpeed);
+//        }
+//
+//
+//        if(rad_to_target < Math.toRadians(3))
+//            turnPower = 0;
+//        if(relative_abs_x < 1)
+//            movement_x_power = 0;
+//        if(relative_abs_y < 1)
+//            movement_y_power = 0;
+//
+//        DriveTrain.movementTurn = turnPower;
+//        DriveTrain.movementX = movement_x_power;
+//        DriveTrain.movementY = movement_y_power;
+//        allComponentsMinPower();
+//        opMode.telemetry.addLine("y_state: " + y_movement_state);
+//        opMode.telemetry.addLine("x_state: " + x_movement_state);
+//        opMode.telemetry.addLine("turn_state: " + turn_movement_state);
+//        opMode.telemetry.addLine("angle to point: " + angleToPoint);
+//        opMode.telemetry.addLine("movement_x_power: " + movement_x_power);
+//        opMode.telemetry.addLine("movement_y_power: " + movement_y_power);
+//    }
+
+    public static void goToPosition(double targetX, double targetY, double moveSpeed) {
+        double distance = Math.hypot(targetX - Odometry.currX, targetY - Odometry.currY);
+
+        double absoluteAngleToTargetPoint = Math.atan2(targetY - Odometry.currY, targetX - Odometry.currX);
+        double relativeAngleToTargetPoint = MathUtil.angleWrap(absoluteAngleToTargetPoint - (Odometry.currHeading - Math.toRadians(90)));
+
+        double relativeXToPoint = Math.cos(relativeAngleToTargetPoint) * distance;
+        double relativeYToPoint = Math.sin(relativeAngleToTargetPoint) * distance;
+
+        double movementXPower = relativeXToPoint / (Math.abs(relativeXToPoint) + Math.abs(relativeYToPoint));
+        double movementYPower = relativeYToPoint / (Math.abs(relativeXToPoint) + Math.abs(relativeYToPoint));
+
+        movementXPower = Range.clip(movementXPower, -moveSpeed, moveSpeed);
+        movementYPower = Range.clip(movementYPower, -moveSpeed, moveSpeed);
+        DriveTrain.movementX = movementXPower;
+        DriveTrain.movementY = movementYPower;
     }
 
 

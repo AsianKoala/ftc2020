@@ -120,6 +120,6 @@ public class Odometry {
 
     public String toString() {
         String newLine = System.getProperty("line.separator");
-        return "x: " + currX + newLine + "y: " + currY + newLine + "heading: " + Math.toDegrees(currHeading);
+        return "x: " + currX + " y: " + currY +  " heading: " + Math.toDegrees(currHeading);
     }
 }

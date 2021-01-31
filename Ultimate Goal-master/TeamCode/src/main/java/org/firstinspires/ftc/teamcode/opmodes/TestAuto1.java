@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.hardware.Odometry;
+import org.firstinspires.ftc.teamcode.movement.PPController;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
 import org.firstinspires.ftc.teamcode.util.Pose;
 
@@ -15,6 +16,7 @@ public class TestAuto1 extends MainAuto {
     public enum progStages {
         driveForward,
         turn,
+        goToPosition,
         stop
     }
 
@@ -25,9 +27,14 @@ public class TestAuto1 extends MainAuto {
     }
 
     @Override
+    public void init_loop() {
+        super.init_loop();
+    }
+
+    @Override
     public void start() {
         super.start();
-        setStage(progStages.turn.ordinal());
+        setStage(progStages.goToPosition.ordinal());
     }
 
     @Override
@@ -62,6 +69,21 @@ public class TestAuto1 extends MainAuto {
             telemetry.addLine("Diff is currently: " + (Math.abs(Math.toDegrees(MathUtil.angleWrap(startPose.heading - Odometry.currHeading))) > 45));
             telemetry.addLine("Diff is currently: " + Math.abs(Math.toDegrees(MathUtil.angleWrap(startPose.heading - Odometry.currHeading))));
             if(Math.abs(Math.toDegrees(MathUtil.angleWrap(startPose.heading - Odometry.currHeading))) > 45) {
+                DriveTrain.stopMovement();
+                nextStage();
+            }
+        }
+
+        if(progStage == progStages.goToPosition.ordinal()) {
+            if(stageFinished) {
+                initProgVars();
+            }
+
+//            PPController.goToPosition(0, 24, 0, 0.5, 0.2, this);
+            Pose targetPose = new Pose(24, 24, 0);
+            PPController.goToPosition(targetPose.x, targetPose.y, 0.5);
+            telemetry.addLine("Diff is currently: " + Odometry.currPose.distanceBetween(targetPose));
+            if(Odometry.currPose.distanceBetween(targetPose) < 2) {
                 DriveTrain.stopMovement();
                 nextStage();
             }

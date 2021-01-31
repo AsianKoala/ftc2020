@@ -51,6 +51,11 @@ public class Robot extends TunableOpMode {
     }
 
     @Override
+    public void init_loop() {
+        telemetry.addLine(odometry.toString());
+    }
+
+    @Override
     public void loop() {
         driveTrain.update();
 

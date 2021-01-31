@@ -60,6 +60,10 @@ public class DriveTrain extends Hardware {
         movementTurn = 0;
     }
 
+    @Override
+    public String toString() {
+        return "movementX: " + movementX + " movementY: " + movementY + " movementTurn: " + movementTurn;
+    }
 
     @Override
     public void update() {

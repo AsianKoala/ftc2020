@@ -24,10 +24,12 @@ public class MainAuto extends Robot {
     protected double startStageX;
     protected double startStageY;
     protected double startStageHeading;
+    protected Pose startStagePose;
     protected void initProgVars() {
         startStageX = Odometry.currX;
         startStageY = Odometry.currY;
         startStageHeading = Odometry.currHeading;
+        startStagePose = new Pose(startStageX, startStageY, startStageHeading);
         stageFinished = false;
         PPController.initCurve();
         PPController.initMove();
@@ -36,6 +38,11 @@ public class MainAuto extends Robot {
     @Override
     public void init() {
         super.init();
+    }
+
+    @Override
+    public void init_loop() {
+        super.init_loop();
     }
 
     @Override

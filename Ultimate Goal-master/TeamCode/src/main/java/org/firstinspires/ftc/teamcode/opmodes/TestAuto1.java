@@ -8,6 +8,8 @@ import org.firstinspires.ftc.teamcode.movement.PPController;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
 import org.firstinspires.ftc.teamcode.util.Pose;
 
+import static org.firstinspires.ftc.teamcode.hardware.BetterOdometry.worldPose;
+
 @Autonomous
 public class TestAuto1 extends MainAuto {
 
@@ -23,7 +25,7 @@ public class TestAuto1 extends MainAuto {
     @Override
     public void init() {
         super.init();
-        odometry.setCurrentPosition(startPose);
+        betterOdometry.setWorldPose(startPose);
     }
 
     @Override
@@ -52,8 +54,8 @@ public class TestAuto1 extends MainAuto {
 
             DriveTrain.movementY = 0.5;
             telemetry.addLine("Currently on stage: " + progStages.driveForward.name());
-            telemetry.addLine("Diff is currently: " + Math.abs(startStageY - Odometry.currY));
-            if(Math.abs(startStageY - Odometry.currY) > 5) {
+            telemetry.addLine("Diff is currently: " + Math.abs(startStageY - worldPose.y));
+            if(Math.abs(startStageY - worldPose.y) > 5) {
                 DriveTrain.stopMovement();
                 nextStage();
             }
@@ -66,9 +68,9 @@ public class TestAuto1 extends MainAuto {
 
             DriveTrain.movementTurn = 0.3;
             telemetry.addLine("Currently on stage: " + progStages.turn.name());
-            telemetry.addLine("Diff is currently: " + (Math.abs(Math.toDegrees(MathUtil.angleWrap(startPose.heading - Odometry.currHeading))) > 45));
-            telemetry.addLine("Diff is currently: " + Math.abs(Math.toDegrees(MathUtil.angleWrap(startPose.heading - Odometry.currHeading))));
-            if(Math.abs(Math.toDegrees(MathUtil.angleWrap(startPose.heading - Odometry.currHeading))) > 45) {
+            telemetry.addLine("Diff is currently: " + (Math.abs(Math.toDegrees(MathUtil.angleWrap(startPose.heading - worldPose.heading))) > 45));
+            telemetry.addLine("Diff is currently: " + Math.abs(Math.toDegrees(MathUtil.angleWrap(startPose.heading - worldPose.heading))));
+            if(Math.abs(Math.toDegrees(MathUtil.angleWrap(startPose.heading - worldPose.heading))) > 45) {
                 DriveTrain.stopMovement();
                 nextStage();
             }
@@ -81,7 +83,7 @@ public class TestAuto1 extends MainAuto {
 
             Pose targetPose = new Pose(12, 12, 0);
             PPController.goToPosition(targetPose.x, targetPose.y, 0.5);
-            telemetry.addLine("Diff is currently: " + Odometry.currPose.distanceBetween(targetPose));
+            telemetry.addLine("Diff is currently: " + worldPose.distanceBetween(targetPose));
         }
 
         if(progStage == progStages.stop.ordinal()) {

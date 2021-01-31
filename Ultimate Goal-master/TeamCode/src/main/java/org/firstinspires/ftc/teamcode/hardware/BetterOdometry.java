@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.hardware;
 import org.firstinspires.ftc.teamcode.util.Pose;
 
 public class BetterOdometry {
-    public Pose worldPose;
+    public static Pose worldPose;
 
     public static final double TICKS_PER_INCH = 1103.8839;
 
@@ -26,7 +26,7 @@ public class BetterOdometry {
         worldPose.heading = heading;
 
         worldPose.x += ((deltaVertical * Math.sin(worldPose.heading)) + deltaHorizontal * Math.cos(worldPose.heading))/TICKS_PER_INCH;
-        worldPose.y += ((deltaVertical * Math.sin(worldPose.heading)) - deltaHorizontal * Math.sin(worldPose.heading))/TICKS_PER_INCH;
+        worldPose.y += ((deltaVertical * Math.cos(worldPose.heading)) - deltaHorizontal * Math.sin(worldPose.heading))/TICKS_PER_INCH;
 
         prevHorizontal = odometrySet.getHorizontalTicks();
         prevVertical = odometrySet.getVerticalTicks();

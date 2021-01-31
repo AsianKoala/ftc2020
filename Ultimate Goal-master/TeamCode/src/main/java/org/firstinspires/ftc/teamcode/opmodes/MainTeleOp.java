@@ -12,7 +12,7 @@ public class MainTeleOp extends Robot {
     @Override
     public void init() {
         super.init();
-        odometry.setCurrentPosition(startPose);
+        betterOdometry.setWorldPose(startPose);
     }
 
     @Override

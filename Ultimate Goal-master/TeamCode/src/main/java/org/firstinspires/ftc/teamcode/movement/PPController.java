@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.movement;
 
 import com.qualcomm.robotcore.util.Range;
 
-import org.apache.commons.math3.analysis.integration.IterativeLegendreGaussIntegrator;
+import static org.firstinspires.ftc.teamcode.hardware.BetterOdometry.worldPose;
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.hardware.Odometry;
 import org.firstinspires.ftc.teamcode.opmodes.MainAuto;
@@ -67,10 +67,10 @@ public class PPController {
 
 //    public static void goToPosition(double targetX, double targetY, double point_angle, double movement_speed, double point_speed, MainAuto opMode) {
 //        //get our distance away from the point
-//        double distanceToPoint = Math.hypot(targetX - Odometry.currX, targetY - Odometry.currY);
+//        double distanceToPoint = Math.hypot(targetX - worldPose.x, targetY - worldPose.y);
 //
-//        double angleToPoint = Math.atan2(targetY-Odometry.currY, targetX-Odometry.currX);
-//        double deltaAngleToPoint = MathUtil.angleWrap(angleToPoint-(Odometry.currHeading-Math.toRadians(90)));
+//        double angleToPoint = Math.atan2(targetY-worldPose.y, targetX-worldPose.x);
+//        double deltaAngleToPoint = MathUtil.angleWrap(angleToPoint-(worldPose.heading-Math.toRadians(90)));
 //        //x and y components required to move toward the next point (with angle correction)
 //        double relative_x_to_point = Math.cos(deltaAngleToPoint) * distanceToPoint;
 //        double relative_y_to_point = Math.sin(deltaAngleToPoint) * distanceToPoint;
@@ -106,7 +106,7 @@ public class PPController {
 //            movement_x_power = Range.clip(((relative_x_to_point/2.5) * smallAdjustSpeed),-smallAdjustSpeed,smallAdjustSpeed);
 //        }
 //
-//        double rad_to_target = MathUtil.angleWrap(point_angle-Odometry.currHeading);
+//        double rad_to_target = MathUtil.angleWrap(point_angle-worldPose.heading);
 //        double turnPower = 0;
 //
 //        //every movement has two states, the fast "gunning" section and the slow refining part. turn this var off when close to target
@@ -146,10 +146,10 @@ public class PPController {
 //    }
 
     public static void goToPosition(double targetX, double targetY, double moveSpeed) {
-        double distance = Math.hypot(targetX - Odometry.currX, targetY - Odometry.currY);
+        double distance = Math.hypot(targetX - worldPose.x, targetY - worldPose.y);
 
-        double absoluteAngleToTargetPoint = Math.atan2(targetY - Odometry.currY, targetX - Odometry.currX);
-        double relativeAngleToTargetPoint = MathUtil.angleWrap(absoluteAngleToTargetPoint - Odometry.currHeading);
+        double absoluteAngleToTargetPoint = Math.atan2(targetY - worldPose.y, targetX - worldPose.x);
+        double relativeAngleToTargetPoint = MathUtil.angleWrap(absoluteAngleToTargetPoint - worldPose.heading);
 
         double relativeXToPoint = Math.cos(relativeAngleToTargetPoint) * distance;
         double relativeYToPoint = Math.sin(relativeAngleToTargetPoint) * distance;
@@ -199,11 +199,11 @@ public class PPController {
         ArrayList<CurvePoint> pathExtended = (ArrayList<CurvePoint>) allPoints.clone();
 
         //first get which segment we are on
-        pointWithIndex clippedToPath = clipToPath(allPoints,Odometry.currX,Odometry.currY);
+        pointWithIndex clippedToPath = clipToPath(allPoints,worldPose.x,worldPose.y);
         int currFollowIndex = clippedToPath.index+1;
 
         //get the point to follow
-        CurvePoint followMe = getFollowPointPath(pathExtended,Odometry.currX,Odometry.currY,
+        CurvePoint followMe = getFollowPointPath(pathExtended,worldPose.x,worldPose.y,
                 allPoints.get(currFollowIndex).followDistance);
 
 
@@ -216,7 +216,7 @@ public class PPController {
 
 
         //get the point to point to
-        CurvePoint pointToMe = getFollowPointPath(pathExtended,Odometry.currX,Odometry.currY,
+        CurvePoint pointToMe = getFollowPointPath(pathExtended,worldPose.x,worldPose.y,
                 allPoints.get(currFollowIndex).pointLength);
 
 
@@ -230,8 +230,8 @@ public class PPController {
 
 
         if(clipedDistToFinalEnd <= followMe.followDistance + 15 ||
-                Math.hypot(Odometry.currX-allPoints.get(allPoints.size()-1).x,
-                        Odometry.currY-allPoints.get(allPoints.size()-1).y) < followMe.followDistance + 15){
+                Math.hypot(worldPose.x-allPoints.get(allPoints.size()-1).x,
+                        worldPose.y-allPoints.get(allPoints.size()-1).y) < followMe.followDistance + 15){
 
             followMe.setPoint(allPoints.get(allPoints.size()-1).toPoint());
         }
@@ -245,7 +245,7 @@ public class PPController {
 //        goToPosition(followMe.x, followMe.y, followAngle, followMe.moveSpeed, followMe.turnSpeed);
 
         //find the angle to that point using atan2
-        double currFollowAngle = Math.atan2(pointToMe.y-Odometry.currY,pointToMe.x-Odometry.currX);
+        double currFollowAngle = Math.atan2(pointToMe.y-worldPose.y,pointToMe.x-worldPose.x);
 
         //if our follow angle is different, point differently
         currFollowAngle += MathUtil.angleWrap(followAngle - Math.toRadians(90));
@@ -272,10 +272,10 @@ public class PPController {
                                                boolean stop) {
 
 //        //let's divide how we are going to slip into components
-//        double currSlipY = (SpeedOmeter.currSlipDistanceY() * Math.sin(Odometry.currHeading)) +
-//                (SpeedOmeter.currSlipDistanceX() * Math.cos(Odometry.currHeading));
-//        double currSlipX = (SpeedOmeter.currSlipDistanceY() * Math.cos(Odometry.currHeading)) +
-//                (SpeedOmeter.currSlipDistanceX() * Math.sin(Odometry.currHeading));
+//        double currSlipY = (SpeedOmeter.currSlipDistanceY() * Math.sin(worldPose.heading)) +
+//                (SpeedOmeter.currSlipDistanceX() * Math.cos(worldPose.heading));
+//        double currSlipX = (SpeedOmeter.currSlipDistanceY() * Math.cos(worldPose.heading)) +
+//                (SpeedOmeter.currSlipDistanceX() * Math.sin(worldPose.heading));
 
         //now we will adjust our target to incorporate how much the robot will slip
 //        double targetXAdjusted = targetX - currSlipX;
@@ -283,17 +283,17 @@ public class PPController {
 
 
         //get our distance away from the adjusted point
-        double distanceToPoint = Math.sqrt(Math.pow(targetX-Odometry.currX,2)
-                + Math.pow(targetY-Odometry.currY,2));
+        double distanceToPoint = Math.sqrt(Math.pow(targetX-worldPose.x,2)
+                + Math.pow(targetY-worldPose.y,2));
 
         //arcTan gives the absolute angle from our location to the adjusted target
         double angleToPointAdjusted =
-                Math.atan2(targetY-Odometry.currY,targetX-Odometry.currX);
+                Math.atan2(targetY-worldPose.y,targetX-worldPose.x);
 
         //we only care about the relative angle to the point, so subtract our angle
         //also subtract 90 since if we were 0 degrees (pointed at it) we use DriveTrain.movementY to
         //go forwards. This is a little bit counter-intuitive
-        double deltaAngleToPointAdjusted = MathUtil.angleWrap(angleToPointAdjusted-(Odometry.currHeading-Math.toRadians(90)));
+        double deltaAngleToPointAdjusted = MathUtil.angleWrap(angleToPointAdjusted-(worldPose.heading-Math.toRadians(90)));
 
         //Relative x and y components required to move toward the next point (with angle correction)
         double relative_x_to_point = Math.cos(deltaAngleToPointAdjusted) * distanceToPoint;
@@ -341,7 +341,7 @@ public class PPController {
         double actualRelativePointAngle = (point_angle-Math.toRadians(90));
 
         //this is the absolute angle to the point on the field
-        double angleToPointRaw = Math.atan2(targetY-Odometry.currY,targetX-Odometry.currX);
+        double angleToPointRaw = Math.atan2(targetY-worldPose.y,targetX-worldPose.x);
         //now if the point is 45 degrees away from us, we then add the actualRelativePointAngle
         //(0 if point_angle 90) to figure out the world angle we should point towards
         double absolutePointAngle = angleToPointRaw+actualRelativePointAngle;
@@ -350,7 +350,7 @@ public class PPController {
 
 
         //now that we know what absolute angle to point to, we calculate how close we are to it
-        double relativePointAngle = MathUtil.angleWrap(absolutePointAngle-Odometry.currHeading);
+        double relativePointAngle = MathUtil.angleWrap(absolutePointAngle-worldPose.heading);
 
 
 
@@ -397,7 +397,7 @@ public class PPController {
     //point_angle is the relative point angle. 90 means face towards it
     public static movementResult pointAngle(double point_angle, double point_speed, double decelerationRadians) {
         //now that we know what absolute angle to point to, we calculate how close we are to it
-        double relativePointAngle = MathUtil.angleWrap(point_angle-Odometry.currHeading);
+        double relativePointAngle = MathUtil.angleWrap(point_angle-worldPose.heading);
 
         //Scale down the relative angle by 40 and multiply by point speed
         double turnSpeed = (relativePointAngle/decelerationRadians)*point_speed;

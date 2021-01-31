@@ -116,6 +116,11 @@ public class PPController {
         followCurveIndex = 0;
     }
 
+    public static void initMove() {
+        x_movement_state = profileStates.gunningIt;
+        y_movement_state = profileStates.gunningIt;
+        turn_movement_state = profileStates.gunningIt;
+    }
 
     /**
      * follows a set of points, while maintaining a following distance
@@ -578,5 +583,6 @@ public class PPController {
 
         return new myPoint(xTarget,yTarget,pointIsOnLine);
     }
+
 
 }

@@ -105,6 +105,11 @@ public class Odometry {
         updateValues();
     }
 
+    public void setStartPosition(Pose startPosition) {
+        currentPosition = startPosition;
+        updateValues();
+    }
+
     private void updateValues() {
         currX = currentPosition.x;
         currY = currentPosition.y;

@@ -54,6 +54,12 @@ public class DriveTrain extends Hardware {
         }
     }
 
+    public static void stopMovement() {
+        movementX = 0;
+        movementY = 0;
+        movementTurn = 0;
+    }
+
 
     @Override
     public void update() {

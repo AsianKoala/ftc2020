@@ -10,11 +10,11 @@ public class OdometrySet {
         this.lateral = lateral;
     }
 
-    public int getParallelTicks() {
+    public int getVerticalTicks() {
         return parallel.getCurrentPosition();
     }
 
-    public int getLateralTicks() {
+    public int getHorizontalTicks() {
         return lateral.getCurrentPosition();
     }
 }

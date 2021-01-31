@@ -149,7 +149,7 @@ public class PPController {
         double distance = Math.hypot(targetX - Odometry.currX, targetY - Odometry.currY);
 
         double absoluteAngleToTargetPoint = Math.atan2(targetY - Odometry.currY, targetX - Odometry.currX);
-        double relativeAngleToTargetPoint = MathUtil.angleWrap(absoluteAngleToTargetPoint - (Odometry.currHeading - Math.toRadians(90)));
+        double relativeAngleToTargetPoint = MathUtil.angleWrap(absoluteAngleToTargetPoint - Odometry.currHeading);
 
         double relativeXToPoint = Math.cos(relativeAngleToTargetPoint) * distance;
         double relativeYToPoint = Math.sin(relativeAngleToTargetPoint) * distance;

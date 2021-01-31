@@ -23,7 +23,7 @@ public class TestAuto1 extends MainAuto {
     @Override
     public void init() {
         super.init();
-        odometry.setStartPosition(startPose);
+        odometry.setCurrentPosition(startPose);
     }
 
     @Override
@@ -79,14 +79,9 @@ public class TestAuto1 extends MainAuto {
                 initProgVars();
             }
 
-//            PPController.goToPosition(0, 24, 0, 0.5, 0.2, this);
-            Pose targetPose = new Pose(24, 24, 0);
+            Pose targetPose = new Pose(12, 12, 0);
             PPController.goToPosition(targetPose.x, targetPose.y, 0.5);
             telemetry.addLine("Diff is currently: " + Odometry.currPose.distanceBetween(targetPose));
-            if(Odometry.currPose.distanceBetween(targetPose) < 2) {
-                DriveTrain.stopMovement();
-                nextStage();
-            }
         }
 
         if(progStage == progStages.stop.ordinal()) {

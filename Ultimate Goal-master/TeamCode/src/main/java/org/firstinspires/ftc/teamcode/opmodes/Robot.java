@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import net.frogbots.ftcopmodetunercommon.opmode.TunableOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.teamcode.hardware.BetterOdometry;
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
 import org.firstinspires.ftc.teamcode.hardware.Odometry;
@@ -31,6 +32,8 @@ public class Robot extends TunableOpMode {
     private double headingOffset;
     private double lastHeading;
 
+    BetterOdometry betterOdometry;
+
 
     @Override
     public void init() {
@@ -43,11 +46,13 @@ public class Robot extends TunableOpMode {
         backRight = hardwareMap.get(ExpansionHubMotor.class, "BR");
         driveTrain = new DriveTrain(frontLeft, backLeft, frontRight, backRight);
 
-        ExpansionHubMotor parallelOdometer = hardwareMap.get(ExpansionHubMotor.class, "leftIntake");
-        ExpansionHubMotor lateralOdometer = hardwareMap.get(ExpansionHubMotor.class, "rightIntake");
-        odometrySet = new OdometrySet(lateralOdometer, parallelOdometer);
+        ExpansionHubMotor verticalOdometer = hardwareMap.get(ExpansionHubMotor.class, "leftIntake");
+        ExpansionHubMotor horizontalOdometer = hardwareMap.get(ExpansionHubMotor.class, "rightIntake");
+        odometrySet = new OdometrySet(verticalOdometer, horizontalOdometer);
         odometry = new Odometry(odometrySet);
         initBNO055IMU(hardwareMap);
+
+        betterOdometry = new BetterOdometry(odometrySet);
     }
 
     @Override
@@ -61,9 +66,9 @@ public class Robot extends TunableOpMode {
 
         lastHeading = imu.getAngularOrientation().firstAngle - headingOffset;
         odometry.update(lastHeading);
-        telemetry.addLine("last heading: " + Math.toDegrees(lastHeading));
+        telemetry.addLine(odometry.toString());
 
-        telemetry.addLine();
+        betterOdometry.update(lastHeading);
         telemetry.addLine(odometry.toString());
     }
 

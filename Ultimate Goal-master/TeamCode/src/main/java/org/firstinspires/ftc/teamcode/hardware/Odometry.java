@@ -32,7 +32,6 @@ public class Odometry {
     private double prevHeading;
 
     private Pose currentPosition;
-    public Pose relativeRobotMovement;
 
     private OdometrySet odometrySet;
 
@@ -66,7 +65,6 @@ public class Odometry {
         this.odometrySet = odometrySet;
 
         currentPosition = new Pose(start.x, start.y, start.heading);
-        relativeRobotMovement = new Pose(0, 0, 0);
         updateValues();
     }
 
@@ -76,15 +74,15 @@ public class Odometry {
 
     public void update(double heading) {
         double[] deltas = new double[] {
-                encoderTicksToInches(odometrySet.getParallelTicks() - prevParallel,
+                encoderTicksToInches(odometrySet.getVerticalTicks() - prevParallel,
                         TICKS_PER_INCH),
-                encoderTicksToInches(odometrySet.getLateralTicks() - prevLateral,
+                encoderTicksToInches(odometrySet.getHorizontalTicks() - prevLateral,
                         TICKS_PER_INCH),
                 MathUtil.angleWrap(heading - prevHeading)
         };
         System.out.println(Arrays.toString(deltas));
-        prevParallel = odometrySet.getParallelTicks();
-        prevLateral = odometrySet.getLateralTicks();
+        prevParallel = odometrySet.getVerticalTicks();
+        prevLateral = odometrySet.getHorizontalTicks();
         prevHeading = heading;
         updateFromRelative(deltas);
     }
@@ -100,12 +98,11 @@ public class Odometry {
                 rawPoseDelta.getEntry(2, 0)
         );
 
-        relativeRobotMovement = relativeRobotMovement.add(robotPoseDelta);
         currentPosition = MathUtil.relativeOdometryUpdate(currentPosition, robotPoseDelta);
         updateValues();
     }
 
-    public void setStartPosition(Pose startPosition) {
+    public void setCurrentPosition(Pose startPosition) {
         currentPosition = startPosition;
         updateValues();
     }
@@ -119,7 +116,6 @@ public class Odometry {
 
 
     public String toString() {
-        String newLine = System.getProperty("line.separator");
         return "x: " + currX + " y: " + currY +  " heading: " + Math.toDegrees(currHeading);
     }
 }

@@ -3,13 +3,16 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
+import org.firstinspires.ftc.teamcode.util.Pose;
 
 @TeleOp
 public class MainTeleOp extends Robot {
 
+    Pose startPose = new Pose(0,0,0);
     @Override
     public void init() {
         super.init();
+        odometry.setCurrentPosition(startPose);
     }
 
     @Override

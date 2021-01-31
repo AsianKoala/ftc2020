@@ -11,9 +11,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.teamcode.hardware.BetterOdometry;
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
+import org.firstinspires.ftc.teamcode.hardware.Odometry;
 import org.firstinspires.ftc.teamcode.hardware.OdometrySet;
 import org.firstinspires.ftc.teamcode.util.AxesSigns;
 import org.firstinspires.ftc.teamcode.util.BNO055IMUUtil;
+import org.firstinspires.ftc.teamcode.util.MathUtil;
 import org.firstinspires.ftc.teamcode.util.Pose;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
@@ -31,6 +33,7 @@ public class Robot extends TunableOpMode {
     private double headingOffset;
     private double lastHeading;
 
+    public Odometry odometry;
 
 
     @Override
@@ -47,9 +50,11 @@ public class Robot extends TunableOpMode {
         ExpansionHubMotor verticalOdometer = hardwareMap.get(ExpansionHubMotor.class, "leftIntake");
         ExpansionHubMotor horizontalOdometer = hardwareMap.get(ExpansionHubMotor.class, "rightIntake");
         odometrySet = new OdometrySet(verticalOdometer, horizontalOdometer);
-        betterOdometry = new BetterOdometry(odometrySet);
+        betterOdometry = new BetterOdometry(odometrySet, new Pose(0, 0, Math.toRadians(90)));
         initBNO055IMU(hardwareMap);
 
+
+        odometry = new Odometry(new Pose(0, 0, Math.toRadians(90)), odometrySet);
     }
 
     @Override
@@ -67,8 +72,12 @@ public class Robot extends TunableOpMode {
         driveTrain.update();
 
         lastHeading = imu.getAngularOrientation().firstAngle - headingOffset;
-        betterOdometry.update(lastHeading);
+        betterOdometry.update(MathUtil.angleWrap(lastHeading + betterOdometry.startPose.heading));
         telemetry.addLine(betterOdometry.toString());
+
+        odometry.update(MathUtil.angleWrap(lastHeading + odometry.startHeading));
+        telemetry.addLine();
+        telemetry.addLine(odometry.toString());
     }
 
 

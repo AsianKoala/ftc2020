@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import static org.firstinspires.ftc.teamcode.hardware.BetterOdometry.worldPose;
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
+import org.firstinspires.ftc.teamcode.opmodes.Auto;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
 import org.firstinspires.ftc.teamcode.util.Point;
 
@@ -143,7 +144,7 @@ public class PPController {
 //        opMode.telemetry.addLine("movement_y_power: " + movement_y_power);
 //    }
 
-    public static void goToPosition(double targetX, double targetY, double moveSpeed) {
+    public static void goToPosition(double targetX, double targetY, double moveSpeed, Auto opmode) {
         double distance = Math.hypot(targetX - worldPose.x, targetY - worldPose.y);
 
         double absoluteAngleToTargetPoint = Math.atan2(targetY - worldPose.y, targetX - worldPose.x);
@@ -159,6 +160,10 @@ public class PPController {
         movementYPower = Range.clip(movementYPower, -moveSpeed, moveSpeed);
         DriveTrain.movementX = movementXPower;
         DriveTrain.movementY = movementYPower;
+
+        opmode.telemetry.addLine("relativeX: " + relativeXToPoint);
+        opmode.telemetry.addLine("relativeY: " + relativeYToPoint);
+
     }
 
 

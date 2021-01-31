@@ -5,7 +5,7 @@ import static org.firstinspires.ftc.teamcode.hardware.BetterOdometry.worldPose;
 import org.firstinspires.ftc.teamcode.movement.PPController;
 import org.firstinspires.ftc.teamcode.util.Pose;
 
-public class MainAuto extends Robot {
+public class Auto extends Robot {
 
     public int progStage;
     public boolean stageFinished;

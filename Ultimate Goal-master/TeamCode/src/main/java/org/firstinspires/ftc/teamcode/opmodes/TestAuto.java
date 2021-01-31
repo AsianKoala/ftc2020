@@ -10,9 +10,8 @@ import org.firstinspires.ftc.teamcode.util.Pose;
 import static org.firstinspires.ftc.teamcode.hardware.BetterOdometry.worldPose;
 
 @Autonomous
-public class TestAuto1 extends MainAuto {
+public class TestAuto extends Auto {
 
-    Pose startPose = new Pose(0, 0, 0);
 
     public enum progStages {
         driveForward,
@@ -24,7 +23,6 @@ public class TestAuto1 extends MainAuto {
     @Override
     public void init() {
         super.init();
-        betterOdometry.setWorldPose(startPose);
     }
 
     @Override
@@ -67,9 +65,9 @@ public class TestAuto1 extends MainAuto {
 
             DriveTrain.movementTurn = 0.3;
             telemetry.addLine("Currently on stage: " + progStages.turn.name());
-            telemetry.addLine("Diff is currently: " + (Math.abs(Math.toDegrees(MathUtil.angleWrap(startPose.heading - worldPose.heading))) > 45));
-            telemetry.addLine("Diff is currently: " + Math.abs(Math.toDegrees(MathUtil.angleWrap(startPose.heading - worldPose.heading))));
-            if(Math.abs(Math.toDegrees(MathUtil.angleWrap(startPose.heading - worldPose.heading))) > 45) {
+            telemetry.addLine("Diff is currently: " + (Math.abs(Math.toDegrees(MathUtil.angleWrap(startStageHeading - worldPose.heading))) > 45));
+            telemetry.addLine("Diff is currently: " + Math.abs(Math.toDegrees(MathUtil.angleWrap(startStageHeading - worldPose.heading))));
+            if(Math.abs(Math.toDegrees(MathUtil.angleWrap(startStageHeading - worldPose.heading))) > 45) {
                 DriveTrain.stopMovement();
                 nextStage();
             }
@@ -81,10 +79,10 @@ public class TestAuto1 extends MainAuto {
             }
 
             Pose targetPose = new Pose(12, 12, 0);
-            PPController.goToPosition(targetPose.x, targetPose.y, 0.5);
+            PPController.goToPosition(targetPose.x, targetPose.y, 0.3, this);
             telemetry.addLine("Diff is currently: " + worldPose.distanceBetween(targetPose));
 
-            if(worldPose.distanceBetween(targetPose) < 2)
+            if(worldPose.distanceBetween(targetPose) < 1)
                 DriveTrain.stopMovement();
         }
 

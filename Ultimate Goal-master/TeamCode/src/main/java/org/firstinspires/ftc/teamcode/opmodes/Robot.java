@@ -25,13 +25,12 @@ public class Robot extends TunableOpMode {
     public DriveTrain driveTrain;
 
     // odom shit
-//    public Odometry odometry;
+    public BetterOdometry betterOdometry;
     public OdometrySet odometrySet;
     private BNO055IMU imu;
     private double headingOffset;
     private double lastHeading;
 
-    BetterOdometry betterOdometry;
 
 
     @Override
@@ -56,6 +55,11 @@ public class Robot extends TunableOpMode {
     @Override
     public void init_loop() {
         telemetry.addLine(betterOdometry.toString());
+    }
+
+    @Override
+    public void start() {
+        odometrySet.markCurrOffset();
     }
 
     @Override

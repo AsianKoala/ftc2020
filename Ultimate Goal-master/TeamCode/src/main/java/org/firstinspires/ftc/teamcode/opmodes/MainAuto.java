@@ -48,6 +48,7 @@ public class MainAuto extends Robot {
 
     @Override
     public void start() {
+        super.start();
         progStage = 0;
         completedStages = 0;
         stageFinished = true;

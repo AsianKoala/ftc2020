@@ -16,6 +16,16 @@ public class MainTeleOp extends Robot {
     }
 
     @Override
+    public void init_loop() {
+        super.init_loop();
+    }
+
+    @Override
+    public void start() {
+        super.start();
+    }
+
+    @Override
     public void loop() {
         super.loop();
 

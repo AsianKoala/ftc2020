@@ -10,7 +10,7 @@ public class BetterOdometry {
     public double prevVertical;
     public double prevHorizontal;
 
-    public OdometrySet odometrySet;
+    private OdometrySet odometrySet;
 
     public BetterOdometry(OdometrySet odometrySet) {
         this.odometrySet = odometrySet;

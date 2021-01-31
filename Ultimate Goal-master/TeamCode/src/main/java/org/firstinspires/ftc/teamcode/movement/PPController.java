@@ -4,8 +4,6 @@ import com.qualcomm.robotcore.util.Range;
 
 import static org.firstinspires.ftc.teamcode.hardware.BetterOdometry.worldPose;
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
-import org.firstinspires.ftc.teamcode.hardware.Odometry;
-import org.firstinspires.ftc.teamcode.opmodes.MainAuto;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
 import org.firstinspires.ftc.teamcode.util.Point;
 
@@ -149,7 +147,7 @@ public class PPController {
         double distance = Math.hypot(targetX - worldPose.x, targetY - worldPose.y);
 
         double absoluteAngleToTargetPoint = Math.atan2(targetY - worldPose.y, targetX - worldPose.x);
-        double relativeAngleToTargetPoint = MathUtil.angleWrap(absoluteAngleToTargetPoint - worldPose.heading);
+        double relativeAngleToTargetPoint = MathUtil.angleWrap(absoluteAngleToTargetPoint - (worldPose.heading - Math.toRadians(90)));
 
         double relativeXToPoint = Math.cos(relativeAngleToTargetPoint) * distance;
         double relativeYToPoint = Math.sin(relativeAngleToTargetPoint) * distance;

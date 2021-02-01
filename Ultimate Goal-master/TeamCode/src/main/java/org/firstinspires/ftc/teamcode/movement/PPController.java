@@ -74,14 +74,16 @@ public class PPController {
 
         double relativeXToPoint = Math.cos(relativeAngleToTargetPoint) * distance;
         double relativeYToPoint = Math.sin(relativeAngleToTargetPoint) * distance;
+        double relativeAbsXToPoint = Math.abs(relativeXToPoint);
+        double relativeAbsYToPoint = Math.abs(relativeYToPoint);
 
-        double v = Math.abs(relativeXToPoint) + Math.abs(relativeYToPoint);
+        double v = relativeAbsXToPoint + relativeAbsYToPoint;
         double movementXPower = relativeXToPoint / v;
         double movementYPower = relativeYToPoint / v;
 
         if(stop) {
-            movementXPower *= Math.abs(relativeXToPoint) / 12;
-            movementYPower *= Math.abs(relativeYToPoint) / 12;
+            movementXPower *= relativeAbsXToPoint / 12;
+            movementYPower *= relativeAbsYToPoint / 12;
         }
 
         movementX = Range.clip(movementXPower, -moveSpeed, moveSpeed);
@@ -94,13 +96,13 @@ public class PPController {
         double absolutePointAngle = absoluteAngleToTargetPoint + relativeTurnAngle;
         double relativePointAngle = MathUtil.angleWrap(absolutePointAngle - currentPosition.heading);
 
-        double decelerateAngle = Math.toRadians(30);
+        double decelerateAngle = Math.toRadians(40);
 
         double movementTurnSpeed = (relativePointAngle/decelerateAngle) * turnSpeed;
 
         movementTurn = Range.clip(movementTurnSpeed, -turnSpeed, turnSpeed);
 
-        if(distance < 1) {
+        if(distance < 3.9) {
             movementTurn = 0;
         }
 
@@ -108,8 +110,8 @@ public class PPController {
 
 
         // smoothing
-        movementX *= Range.clip((Math.abs(relativeXToPoint)/3.0),0,1);
-        movementY *= Range.clip((Math.abs(relativeYToPoint)/3.0),0,1);
+        movementX *= Range.clip((relativeAbsXToPoint/3.0),0,1);
+        movementY *= Range.clip((relativeAbsYToPoint/3.0),0,1);
         movementTurn *= Range.clip(Math.abs(relativePointAngle)/Math.toRadians(2),0,1);
 
 

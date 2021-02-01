@@ -1,10 +1,8 @@
-package org.firstinspires.ftc.teamcode.hardware;
+package org.firstinspires.ftc.teamcode.movement;
 
 import org.firstinspires.ftc.teamcode.opmodes.Robot;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
 import org.firstinspires.ftc.teamcode.util.Pose;
-
-import java.util.Arrays;
 
 
 public class Odometry {
@@ -52,9 +50,6 @@ public class Odometry {
         prevHorizontal = odometrySet.getHorizontalTicks();
         prevVertical = odometrySet.getVerticalTicks();
         prevHeading = currentPosition.heading;
-
-        Pose deltaPose = new Pose(deltaX, deltaY, deltaAngle);
-        opMode.telemetry.addLine(deltaPose.toString());
     }
 
 

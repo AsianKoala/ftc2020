@@ -3,13 +3,13 @@ package org.firstinspires.ftc.teamcode.movement;
 import com.qualcomm.robotcore.util.Range;
 
 import static org.firstinspires.ftc.teamcode.hardware.DriveTrain.*;
-import static org.firstinspires.ftc.teamcode.hardware.Odometry.*;
+import static org.firstinspires.ftc.teamcode.movement.Odometry.*;
+import static org.firstinspires.ftc.teamcode.util.MathUtil.*;
 
+import org.firstinspires.ftc.teamcode.util.Point;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
 
-
 import java.util.ArrayList;
-
 
 
 public class PPController {
@@ -63,6 +63,36 @@ public class PPController {
     }
 
 
+    public static void followCurve(ArrayList<CurvePoint> allPoints, double followAngle) {
+        CurvePoint followMe = getFollowPointPath(allPoints, currentPosition.x, currentPosition.y, allPoints.get(0).followDistance);
+
+        goToPosition(followMe.x, followMe.y, followMe.moveSpeed, followAngle, followMe.turnSpeed, followMe.slowDownTurnRadians, followMe.slowDownTurnAmount, false);
+    }
+
+    public static CurvePoint getFollowPointPath(ArrayList<CurvePoint> pathPoints, double xPos, double yPos, double followRadius) {
+        CurvePoint followMe = new CurvePoint(pathPoints.get(0));
+
+        for(int i=0; i<pathPoints.size()-1; i++) {
+            CurvePoint startPoint = pathPoints.get(i);
+            CurvePoint endPoint = pathPoints.get(i+1);
+
+            ArrayList<Point> intersections = lineCircleIntersection(xPos, yPos, followRadius, startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+
+            double closestAngle = 10000000;
+
+            for(Point thisIntersection : intersections) {
+                double angle = Math.atan2(thisIntersection.y - currentPosition.y, thisIntersection.x - currentPosition.x);
+                double relativeAngle = Math.abs(MathUtil.angleWrap(angle - currentPosition.heading));
+
+                if(relativeAngle < closestAngle) {
+                    closestAngle = relativeAngle;
+                    followMe.setPoint(thisIntersection);
+                }
+            }
+        }
+
+        return followMe;
+    }
 
 
 
@@ -100,7 +130,7 @@ public class PPController {
 
         movementTurn = Range.clip(movementTurnSpeed, -turnSpeed, turnSpeed);
 
-        if(distance < 3) {
+        if(distance < 1) {
             movementTurn = 0;
         }
 
@@ -125,87 +155,6 @@ public class PPController {
 
 
 
-
-
-//    public static void goToPosition(double targetX, double targetY, double point_angle, double movement_speed, double point_speed, MainAuto opMode) {
-//        //get our distance away from the point
-//        double distanceToPoint = Math.hypot(targetX - worldPose.x, targetY - worldPose.y);
-//
-//        double angleToPoint = Math.atan2(targetY-worldPose.y, targetX-worldPose.x);
-//        double deltaAngleToPoint = MathUtil.angleWrap(angleToPoint-(worldPose.heading-Math.toRadians(90)));
-//        //x and y components required to move toward the next point (with angle correction)
-//        double relative_x_to_point = Math.cos(deltaAngleToPoint) * distanceToPoint;
-//        double relative_y_to_point = Math.sin(deltaAngleToPoint) * distanceToPoint;
-//
-//        double relative_abs_x = Math.abs(relative_x_to_point);
-//        double relative_abs_y = Math.abs(relative_y_to_point);
-//
-//
-//
-//        //preserve the shape (ratios) of our intended movement direction but scale it by movement_speed
-//        double movement_x_power = (relative_x_to_point / (relative_abs_y+relative_abs_x)) * movement_speed;
-//        double movement_y_power = (relative_y_to_point / (relative_abs_y+relative_abs_x)) * movement_speed;
-//
-//        //every movement has two states, the fast "gunning" section and the slow refining part. turn this var off when close to target
-//        if(y_movement_state == profileStates.gunningIt) {
-//            if(relative_abs_y < 3){
-//                y_movement_state = y_movement_state.next();
-//            }
-//        }
-//
-//
-//        if(y_movement_state == profileStates.fineAdjustment){
-//            movement_y_power = Range.clip(((relative_y_to_point/8.0) * 0.15),-0.15,0.15);
-//        }
-//
-//        if(x_movement_state == profileStates.gunningIt) {
-//            if(relative_abs_x < 3){
-//                x_movement_state = x_movement_state.next();
-//            }
-//        }
-//
-//        if(x_movement_state == profileStates.fineAdjustment){
-//            movement_x_power = Range.clip(((relative_x_to_point/2.5) * smallAdjustSpeed),-smallAdjustSpeed,smallAdjustSpeed);
-//        }
-//
-//        double rad_to_target = MathUtil.angleWrap(point_angle-worldPose.heading);
-//        double turnPower = 0;
-//
-//        //every movement has two states, the fast "gunning" section and the slow refining part. turn this var off when close to target
-//        if(turn_movement_state == profileStates.gunningIt) {
-//            turnPower = rad_to_target > 0 ? point_speed : -point_speed;
-//            if(Math.abs(rad_to_target) < Math.toRadians(3.0)){
-//                turn_movement_state = turn_movement_state.next();
-//            }
-//
-//        }
-//
-//
-//        if(turn_movement_state == profileStates.fineAdjustment){
-//            //this is a var that will go from 0 to 1 in the course of 10 degrees from the target
-//            turnPower = (rad_to_target/Math.toRadians(10)) * smallAdjustSpeed;
-//            turnPower = Range.clip(turnPower,-smallAdjustSpeed,smallAdjustSpeed);
-//        }
-//
-//
-//        if(rad_to_target < Math.toRadians(3))
-//            turnPower = 0;
-//        if(relative_abs_x < 1)
-//            movement_x_power = 0;
-//        if(relative_abs_y < 1)
-//            movement_y_power = 0;
-//
-//        movementTurn = turnPower;
-//        movementX = movement_x_power;
-//        movementY = movement_y_power;
-//        allComponentsMinPower();
-//        opMode.telemetry.addLine("y_state: " + y_movement_state);
-//        opMode.telemetry.addLine("x_state: " + x_movement_state);
-//        opMode.telemetry.addLine("turn_state: " + turn_movement_state);
-//        opMode.telemetry.addLine("angle to point: " + angleToPoint);
-//        opMode.telemetry.addLine("movement_x_power: " + movement_x_power);
-//        opMode.telemetry.addLine("movement_y_power: " + movement_y_power);
-//    }
 
 //
 //
@@ -309,135 +258,9 @@ public class PPController {
 //            this.turnDelta_rad = turnDelta_rad;
 //        }
 //    }
-//
-//    public static movementResult gunToPosition(double targetX, double targetY,double point_angle,
-//                                               double movement_speed, double point_speed,
-//                                               double slowDownTurnRadians, double slowDownMovementFromTurnError,
-//                                               boolean stop) {
-//
-////        //let's divide how we are going to slip into components
-////        double currSlipY = (SpeedOmeter.currSlipDistanceY() * Math.sin(worldPose.heading)) +
-////                (SpeedOmeter.currSlipDistanceX() * Math.cos(worldPose.heading));
-////        double currSlipX = (SpeedOmeter.currSlipDistanceY() * Math.cos(worldPose.heading)) +
-////                (SpeedOmeter.currSlipDistanceX() * Math.sin(worldPose.heading));
-//
-//        //now we will adjust our target to incorporate how much the robot will slip
-////        double targetXAdjusted = targetX - currSlipX;
-////        double targetYAdjusted = targetY - currSlipY;
-//
-//
-//        //get our distance away from the adjusted point
-//        double distanceToPoint = Math.sqrt(Math.pow(targetX-worldPose.x,2)
-//                + Math.pow(targetY-worldPose.y,2));
-//
-//        //arcTan gives the absolute angle from our location to the adjusted target
-//        double angleToPointAdjusted =
-//                Math.atan2(targetY-worldPose.y,targetX-worldPose.x);
-//
-//        //we only care about the relative angle to the point, so subtract our angle
-//        //also subtract 90 since if we were 0 degrees (pointed at it) we use movementY to
-//        //go forwards. This is a little bit counter-intuitive
-//        double deltaAngleToPointAdjusted = MathUtil.angleWrap(angleToPointAdjusted-(worldPose.heading-Math.toRadians(90)));
-//
-//        //Relative x and y components required to move toward the next point (with angle correction)
-//        double relative_x_to_point = Math.cos(deltaAngleToPointAdjusted) * distanceToPoint;
-//        double relative_y_to_point = Math.sin(deltaAngleToPointAdjusted) * distanceToPoint;
-//
-//        //just the absolute value of the relative components to the point (adjusted for slip)
-//        double relative_abs_x = Math.abs(relative_x_to_point);
-//        double relative_abs_y = Math.abs(relative_y_to_point);
-//
-//
-//
-//        /**NOW WE CAN START CALCULATING THE POWER OF EACH MOTOR */
-//        //let's initialize to a power that doesn't care how far we are away from the point
-//        //We do this by just calculating the ratios (shape) of the movement with respect to
-//        //the sum of the two components, (sum of the absolute values to preserve the sines)
-//        //so total magnitude should always equal 1
-//        double movement_x_power = (relative_x_to_point / (relative_abs_y+relative_abs_x));
-//        double movement_y_power = (relative_y_to_point / (relative_abs_y+relative_abs_x));
-//
-//
-//
-//        //So we will basically not care about what movement_speed was given, we are going to
-//        //decelerate over the course of 30 cm anyways (100% to 0) and then clip the final values
-//        //to have a max of movement_speed.
-//        if(stop){
-//            movement_x_power *= relative_abs_x / 30.0;
-//            movement_y_power *= relative_abs_y / 30.0;
-//        }
-//
-//
-//        //clip the final speed to be in the range the user wants
-//        movementX = Range.clip(movement_x_power,-movement_speed,movement_speed);
-//        movementY = Range.clip(movement_y_power,-movement_speed,movement_speed);
-//
-//
-//
-//
-//
-//
-//
-//        /**NOW WE CAN DEAL WITH TURNING STUFF */
-//        //actualRelativePointAngle is adjusted for what side of the robot the user wants pointed
-//        //towards the point of course we need to subtract 90, since when the user says 90, we want
-//        //to be pointed straight at the point (relative angle of 0)
-//        double actualRelativePointAngle = (point_angle-Math.toRadians(90));
-//
-//        //this is the absolute angle to the point on the field
-//        double angleToPointRaw = Math.atan2(targetY-worldPose.y,targetX-worldPose.x);
-//        //now if the point is 45 degrees away from us, we then add the actualRelativePointAngle
-//        //(0 if point_angle 90) to figure out the world angle we should point towards
-//        double absolutePointAngle = angleToPointRaw+actualRelativePointAngle;
-//
-//
-//
-//
-//        //now that we know what absolute angle to point to, we calculate how close we are to it
-//        double relativePointAngle = MathUtil.angleWrap(absolutePointAngle-worldPose.heading);
-//
-//
-//
-//        //change the turn deceleration based on how fast we are going
-//        double decelerationDistance = Math.toRadians(40);
-//
-//
-//        //Scale down the relative angle by 40 and multiply by point speed
-//        double turnSpeed = (relativePointAngle/decelerationDistance)*point_speed;
-//
-//
-//
-//
-//
-//        //now just clip the result to be in range
-//        movementTurn = Range.clip(turnSpeed,-point_speed,point_speed);
-//        //HOWEVER don't go frantic when right next to the point
-//        if(distanceToPoint < 10){
-//            movementTurn = 0;
-//        }
-//
-//        //make sure the largest component doesn't fall below it's minimum power
-//
-//
-//        //add a smoothing effect at the very last 3 cm, where we should turn everything off,
-//        //no oscillation around here
-//        movementX *= Range.clip((relative_abs_x/6.0),0,1);
-//        movementY *= Range.clip((relative_abs_y/6.0),0,1);
-//
-//        movementTurn *= Range.clip(Math.abs(relativePointAngle)/Math.toRadians(2),0,1);
-//
-//
-//        //slow down if our point angle is off
-//        double errorTurnSoScaleDownMovement = Range.clip(1.0-Math.abs(relativePointAngle/slowDownTurnRadians),1.0-slowDownMovementFromTurnError,1);
-//        //don't slow down if we aren't trying to turn (distanceToPoint < 10)
-//        if(Math.abs(movementTurn) < 0.00001){
-//            errorTurnSoScaleDownMovement = 1;
-//        }
-//        movementX *= errorTurnSoScaleDownMovement;
-//        movementY *= errorTurnSoScaleDownMovement;
-//
-//        return new movementResult(relativePointAngle);
-//    }
+
+
+
 //    //point_angle is the relative point angle. 90 means face towards it
 //    public static movementResult pointAngle(double point_angle, double point_speed, double decelerationRadians) {
 //        //now that we know what absolute angle to point to, we calculate how close we are to it

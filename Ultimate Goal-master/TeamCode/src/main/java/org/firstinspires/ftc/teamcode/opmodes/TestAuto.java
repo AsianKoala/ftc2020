@@ -3,10 +3,13 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
-import org.firstinspires.ftc.teamcode.hardware.Odometry;
+import org.firstinspires.ftc.teamcode.movement.CurvePoint;
+import org.firstinspires.ftc.teamcode.movement.Odometry;
 import org.firstinspires.ftc.teamcode.movement.PPController;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
-import org.firstinspires.ftc.teamcode.util.Pose;
+import org.firstinspires.ftc.teamcode.util.Point;
+
+import java.util.ArrayList;
 
 
 @Autonomous
@@ -16,7 +19,7 @@ public class TestAuto extends Auto {
     public enum progStages {
         driveForward,
         turn,
-        goToPosition,
+        purePursuit,
         stop
     }
 
@@ -33,7 +36,7 @@ public class TestAuto extends Auto {
     @Override
     public void start() {
         super.start();
-        setStage(progStages.goToPosition.ordinal());
+        setStage(progStages.purePursuit.ordinal());
     }
 
     @Override
@@ -68,15 +71,26 @@ public class TestAuto extends Auto {
             }
         }
 
-        if(progStage == progStages.goToPosition.ordinal()) {
+        if(progStage == progStages.purePursuit.ordinal()) {
             if(stageFinished) {
                 initProgVars();
             }
 
 
-            PPController.goToPosition(36, 36, 0.75, Math.toRadians(90), 0.5, Math.toRadians(30), 0, false);
-            if(Odometry.currentPosition.distanceBetween(new Pose(-24,24,0)) < 1)
+//            PPController.goToPosition(36, 36, 0.75, Math.toRadians(90), 0.75, Math.toRadians(15), 0, false);
+//            if(Odometry.currentPosition.distanceBetween(new Pose(-24,24,0)) < 1)
+//                DriveTrain.stopMovement();
+
+            ArrayList<CurvePoint> allPoints = new ArrayList<>();
+            allPoints.add(new CurvePoint(0, 0, 0.75, 0.75, 20, Math.toRadians(30), 1.0));
+            allPoints.add(new CurvePoint(9, 27, 0.75, 0.75, 20, Math.toRadians(30), 1.0));
+            allPoints.add(new CurvePoint(36, 36, 0.75, 0.75, 20, Math.toRadians(30), 1.0));
+
+            PPController.followCurve(allPoints, Math.toRadians(90));
+
+            if(Odometry.currentPosition.distance(new Point(36, 36)) < 1) {
                 DriveTrain.stopMovement();
+            }
         }
 
         if(progStage == progStages.stop.ordinal()) {

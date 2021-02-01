@@ -1,8 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 
-import org.firstinspires.ftc.teamcode.hardware.Odometry;
-import org.firstinspires.ftc.teamcode.movement.PPController;
+import org.firstinspires.ftc.teamcode.movement.Odometry;
 import org.firstinspires.ftc.teamcode.util.Pose;
 
 public class Auto extends Robot {

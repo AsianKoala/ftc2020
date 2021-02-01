@@ -214,7 +214,7 @@ public class PPController {
 
 
 
-        return clipedDistToFinalEnd < 2;//if we are less than 10 cm to the target, return true
+        return clipedDistToFinalEnd < 4;//if we are less than 10 cm to the target, return true
     }
 
 

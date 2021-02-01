@@ -74,7 +74,7 @@ public class TestAuto extends Auto {
             }
 
 
-            PPController.goToPosition(36, 36, 0.5, Math.toRadians(90), 0.3, Math.toRadians(30), 0.5, true);
+            PPController.goToPosition(36, 36, 0.75, Math.toRadians(90), 0.5, Math.toRadians(30), 0, false);
             if(Odometry.currentPosition.distanceBetween(new Pose(-24,24,0)) < 1)
                 DriveTrain.stopMovement();
         }

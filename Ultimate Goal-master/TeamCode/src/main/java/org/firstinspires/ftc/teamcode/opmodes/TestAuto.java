@@ -83,7 +83,7 @@ public class TestAuto extends Auto {
             allPoints.add(new CurvePoint(0, 0, 0, 0, 0, 0, 0, 0));
             allPoints.add(new CurvePoint(9, 27, 0.75, 0.75, 20, 20, Math.toRadians(60), 0.5));
             allPoints.add(new CurvePoint(36, 36, 0.75, 0.75, 20, 20, Math.toRadians(60), 0.5));
-            allPoints.add(new CurvePoint(50, 36, 0.75, 0.75, 20, 20, Math.toRadians(60), 0));
+            allPoints.add(new CurvePoint(45, 36, 0.75, 0.75, 20, 20, Math.toRadians(60), 0));
             boolean complete = PPController.followCurve(allPoints, Math.toRadians(90));
 
             if(complete) {

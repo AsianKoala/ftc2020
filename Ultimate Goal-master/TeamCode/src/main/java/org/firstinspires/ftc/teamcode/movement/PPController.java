@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.movement;
 
 import com.qualcomm.robotcore.util.Range;
 
+import static org.firstinspires.ftc.teamcode.hardware.DriveTrain.*;
 import static org.firstinspires.ftc.teamcode.hardware.Odometry.*;
-import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
 
 import org.firstinspires.ftc.teamcode.util.MathUtil;
 
@@ -37,17 +37,17 @@ public class PPController {
     public static double movement_turn_min = 0.10;
 
     private static void allComponentsMinPower() {
-        if(Math.abs(DriveTrain.movementX) > Math.abs(DriveTrain.movementY)){
-            if(Math.abs(DriveTrain.movementX) > Math.abs(DriveTrain.movementTurn)){
-                DriveTrain.movementX = minPower(DriveTrain.movementX,movement_x_min);
+        if(Math.abs(movementX) > Math.abs(movementY)){
+            if(Math.abs(movementX) > Math.abs(movementTurn)){
+                movementX = minPower(movementX,movement_x_min);
             }else{
-                DriveTrain.movementTurn = minPower(DriveTrain.movementTurn,movement_turn_min);
+                movementTurn = minPower(movementTurn,movement_turn_min);
             }
         }else{
-            if(Math.abs(DriveTrain.movementY) > Math.abs(DriveTrain.movementTurn)){
-                DriveTrain.movementY = minPower(DriveTrain.movementY, movement_y_min);
+            if(Math.abs(movementY) > Math.abs(movementTurn)){
+                movementY = minPower(movementY, movement_y_min);
             }else{
-                DriveTrain.movementTurn = minPower(DriveTrain.movementTurn,movement_turn_min);
+                movementTurn = minPower(movementTurn,movement_turn_min);
             }
         }
     }
@@ -66,7 +66,7 @@ public class PPController {
 
 
 
-    public static void goToPosition(double targetX, double targetY, double moveSpeed, double prefAngle, double turnSpeed) {
+    public static void goToPosition(double targetX, double targetY, double moveSpeed, double prefAngle, double turnSpeed, double slowDownTurnRadians, double slowDownMovementFromTurnError, boolean stop) {
         double distance = Math.hypot(targetX - currentPosition.x, targetY - currentPosition.y);
 
         double absoluteAngleToTargetPoint = Math.atan2(targetY - currentPosition.y, targetX - currentPosition.x);
@@ -79,16 +79,50 @@ public class PPController {
         double movementXPower = relativeXToPoint / v;
         double movementYPower = relativeYToPoint / v;
 
-        DriveTrain.movementX = movementXPower * moveSpeed;
-        DriveTrain.movementY = movementYPower * moveSpeed;
+        if(stop) {
+            movementXPower *= Math.abs(relativeXToPoint) / 12;
+            movementYPower *= Math.abs(relativeYToPoint) / 12;
+        }
 
-        double relativeTurnAngle  = relativeAngleToTargetPoint - Math.toRadians(180) + prefAngle;
-        DriveTrain.movementTurn = Range.clip(relativeTurnAngle / Math.toRadians(30), -1, 1) * turnSpeed;
+        movementX = Range.clip(movementXPower, -moveSpeed, moveSpeed);
+        movementY = Range.clip(movementYPower, -moveSpeed, moveSpeed);
+
+
+        
+        // turning and smoothing shit
+        double relativeTurnAngle = prefAngle - Math.toRadians(90);
+        double absolutePointAngle = absoluteAngleToTargetPoint + relativeTurnAngle;
+        double relativePointAngle = MathUtil.angleWrap(absolutePointAngle - currentPosition.heading);
+
+        double decelerateAngle = Math.toRadians(30);
+
+        double movementTurnSpeed = (relativePointAngle/decelerateAngle) * turnSpeed;
+
+        movementTurn = Range.clip(movementTurnSpeed, -turnSpeed, turnSpeed);
 
         if(distance < 3) {
-            DriveTrain.movementTurn = 0;
+            movementTurn = 0;
         }
+
+        allComponentsMinPower();
+
+
+        // smoothing
+        movementX *= Range.clip((Math.abs(relativeXToPoint)/3.0),0,1);
+        movementY *= Range.clip((Math.abs(relativeYToPoint)/3.0),0,1);
+        movementTurn *= Range.clip(Math.abs(relativePointAngle)/Math.toRadians(2),0,1);
+
+
+        //slow down if our point angle is off
+        double errorTurnSoScaleDownMovement = Range.clip(1.0-Math.abs(relativePointAngle/slowDownTurnRadians),1.0-slowDownMovementFromTurnError,1);
+        //don't slow down if we aren't trying to turn (distanceToPoint < 10)
+        if(Math.abs(movementTurn) < 0.00001){
+            errorTurnSoScaleDownMovement = 1;
+        }
+        movementX *= errorTurnSoScaleDownMovement;
+        movementY *= errorTurnSoScaleDownMovement;
     }
+
 
 
 
@@ -161,9 +195,9 @@ public class PPController {
 //        if(relative_abs_y < 1)
 //            movement_y_power = 0;
 //
-//        DriveTrain.movementTurn = turnPower;
-//        DriveTrain.movementX = movement_x_power;
-//        DriveTrain.movementY = movement_y_power;
+//        movementTurn = turnPower;
+//        movementX = movement_x_power;
+//        movementY = movement_y_power;
 //        allComponentsMinPower();
 //        opMode.telemetry.addLine("y_state: " + y_movement_state);
 //        opMode.telemetry.addLine("x_state: " + x_movement_state);
@@ -261,8 +295,8 @@ public class PPController {
 //        currFollowAngle += MathUtil.angleWrap(followAngle - Math.toRadians(90));
 //
 //        movementResult result = pointAngle(currFollowAngle,allPoints.get(currFollowIndex).turnSpeed,Math.toRadians(45));
-//        DriveTrain.movementX *= 1 - Range.clip(Math.abs(result.turnDelta_rad) / followMe.slowDownTurnRadians,0,followMe.slowDownTurnAmount);
-//        DriveTrain.movementY *= 1 - Range.clip(Math.abs(result.turnDelta_rad) / followMe.slowDownTurnRadians,0,followMe.slowDownTurnAmount);
+//        movementX *= 1 - Range.clip(Math.abs(result.turnDelta_rad) / followMe.slowDownTurnRadians,0,followMe.slowDownTurnAmount);
+//        movementY *= 1 - Range.clip(Math.abs(result.turnDelta_rad) / followMe.slowDownTurnRadians,0,followMe.slowDownTurnAmount);
 //
 //
 //
@@ -301,7 +335,7 @@ public class PPController {
 //                Math.atan2(targetY-worldPose.y,targetX-worldPose.x);
 //
 //        //we only care about the relative angle to the point, so subtract our angle
-//        //also subtract 90 since if we were 0 degrees (pointed at it) we use DriveTrain.movementY to
+//        //also subtract 90 since if we were 0 degrees (pointed at it) we use movementY to
 //        //go forwards. This is a little bit counter-intuitive
 //        double deltaAngleToPointAdjusted = MathUtil.angleWrap(angleToPointAdjusted-(worldPose.heading-Math.toRadians(90)));
 //
@@ -335,8 +369,8 @@ public class PPController {
 //
 //
 //        //clip the final speed to be in the range the user wants
-//        DriveTrain.movementX = Range.clip(movement_x_power,-movement_speed,movement_speed);
-//        DriveTrain.movementY = Range.clip(movement_y_power,-movement_speed,movement_speed);
+//        movementX = Range.clip(movement_x_power,-movement_speed,movement_speed);
+//        movementY = Range.clip(movement_y_power,-movement_speed,movement_speed);
 //
 //
 //
@@ -376,10 +410,10 @@ public class PPController {
 //
 //
 //        //now just clip the result to be in range
-//        DriveTrain.movementTurn = Range.clip(turnSpeed,-point_speed,point_speed);
+//        movementTurn = Range.clip(turnSpeed,-point_speed,point_speed);
 //        //HOWEVER don't go frantic when right next to the point
 //        if(distanceToPoint < 10){
-//            DriveTrain.movementTurn = 0;
+//            movementTurn = 0;
 //        }
 //
 //        //make sure the largest component doesn't fall below it's minimum power
@@ -387,20 +421,20 @@ public class PPController {
 //
 //        //add a smoothing effect at the very last 3 cm, where we should turn everything off,
 //        //no oscillation around here
-//        DriveTrain.movementX *= Range.clip((relative_abs_x/6.0),0,1);
-//        DriveTrain.movementY *= Range.clip((relative_abs_y/6.0),0,1);
+//        movementX *= Range.clip((relative_abs_x/6.0),0,1);
+//        movementY *= Range.clip((relative_abs_y/6.0),0,1);
 //
-//        DriveTrain.movementTurn *= Range.clip(Math.abs(relativePointAngle)/Math.toRadians(2),0,1);
+//        movementTurn *= Range.clip(Math.abs(relativePointAngle)/Math.toRadians(2),0,1);
 //
 //
 //        //slow down if our point angle is off
 //        double errorTurnSoScaleDownMovement = Range.clip(1.0-Math.abs(relativePointAngle/slowDownTurnRadians),1.0-slowDownMovementFromTurnError,1);
 //        //don't slow down if we aren't trying to turn (distanceToPoint < 10)
-//        if(Math.abs(DriveTrain.movementTurn) < 0.00001){
+//        if(Math.abs(movementTurn) < 0.00001){
 //            errorTurnSoScaleDownMovement = 1;
 //        }
-//        DriveTrain.movementX *= errorTurnSoScaleDownMovement;
-//        DriveTrain.movementY *= errorTurnSoScaleDownMovement;
+//        movementX *= errorTurnSoScaleDownMovement;
+//        movementY *= errorTurnSoScaleDownMovement;
 //
 //        return new movementResult(relativePointAngle);
 //    }
@@ -412,13 +446,13 @@ public class PPController {
 //        //Scale down the relative angle by 40 and multiply by point speed
 //        double turnSpeed = (relativePointAngle/decelerationRadians)*point_speed;
 //        //now just clip the result to be in range
-//        DriveTrain.movementTurn = Range.clip(turnSpeed,-point_speed,point_speed);
+//        movementTurn = Range.clip(turnSpeed,-point_speed,point_speed);
 //
 //        //make sure the largest component doesn't fall below it's minimum power
 ////        allComponentsMinPower();
 //
 //        //smooths down the last bit to finally settle on an angle
-//        DriveTrain.movementTurn *= Range.clip(Math.abs(relativePointAngle)/Math.toRadians(3),0,1);
+//        movementTurn *= Range.clip(Math.abs(relativePointAngle)/Math.toRadians(3),0,1);
 //
 //        movementResult r = new movementResult(relativePointAngle);
 //        return r;

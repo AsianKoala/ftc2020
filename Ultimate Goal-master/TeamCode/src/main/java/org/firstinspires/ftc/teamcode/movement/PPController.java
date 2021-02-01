@@ -70,7 +70,7 @@ public class PPController {
         double distance = Math.hypot(targetX - currX, targetY - currY);
 
         double absoluteAngleToTargetPoint = Math.atan2(targetY - currY, targetX - currX);
-        double relativeAngleToTargetPoint = MathUtil.angleWrap(absoluteAngleToTargetPoint - (currHeading));
+        double relativeAngleToTargetPoint = MathUtil.angleWrap(absoluteAngleToTargetPoint - (currHeading - Math.toRadians(90)));
 
         double relativeXToPoint = Math.cos(relativeAngleToTargetPoint) * distance;
         double relativeYToPoint = Math.sin(relativeAngleToTargetPoint) * distance;

@@ -28,8 +28,8 @@ public class Odometry {
     private DecompositionSolver forwardSolver;
 
     public double startHeading;
-    private int prevParallel;
-    private int prevLateral;
+    private int prevVertical;
+    private int prevHorizontal;
     private double prevHeading;
 
     private Pose currentPosition;
@@ -64,8 +64,8 @@ public class Odometry {
         forwardSolver = new LUDecomposition(inverseMatrix).getSolver();
 
         startHeading = start.heading;
-        prevLateral = 0;
-        prevParallel = 0;
+        prevHorizontal = 0;
+        prevVertical = 0;
         prevHeading = startHeading;
         this.odometrySet = odometrySet;
 
@@ -79,15 +79,16 @@ public class Odometry {
 
     public void update(double heading) {
         double[] deltas = new double[] {
-                encoderTicksToInches(odometrySet.getVerticalTicks() - prevParallel,
+                encoderTicksToInches(odometrySet.getHorizontalTicks() - prevHorizontal,
                         TICKS_PER_INCH),
-                encoderTicksToInches(odometrySet.getHorizontalTicks() - prevLateral,
+                encoderTicksToInches(odometrySet.getVerticalTicks() - prevVertical,
                         TICKS_PER_INCH),
                 MathUtil.angleWrap(heading - prevHeading)
         };
         System.out.println(Arrays.toString(deltas));
-        prevParallel = odometrySet.getVerticalTicks();
-        prevLateral = odometrySet.getHorizontalTicks();
+        opMode.telemetry.addLine("odom deltas: " + Arrays.toString(deltas));
+        prevVertical = odometrySet.getVerticalTicks();
+        prevHorizontal = odometrySet.getHorizontalTicks();
         prevHeading = heading;
         updateFromRelative(deltas);
     }
@@ -103,12 +104,15 @@ public class Odometry {
                 rawPoseDelta.getEntry(2, 0)
         );
 
+        opMode.telemetry.addLine("raw pose deltas: " + robotPoseDelta.toString());
+//        double deltaX = odometrySet.getHorizontalTicks() - prev
 
-        opMode.telemetry.addLine("dX: " +robotPoseDelta.x+" dY: " + robotPoseDelta.y+" dH: " + Math.toDegrees(robotPoseDelta.heading));
-//        currentPosition = MathUtil.relativeOdometryUpdate(currentPosition, robotPoseDelta);
         double newHeading = MathUtil.angleWrap(currentPosition.heading + robotPoseDelta.heading);
         double fieldDeltaX = (Math.cos(newHeading) * robotPoseDelta.y) + (Math.sin(newHeading) * robotPoseDelta.x);
         double fieldDeltaY = (Math.sin(newHeading) * robotPoseDelta.y) - (Math.cos(newHeading) * robotPoseDelta.x);
+        Pose addPose = new Pose(fieldDeltaX, fieldDeltaY, robotPoseDelta.heading);
+
+        opMode.telemetry.addLine("field deltas: " + addPose.toString());
         currentPosition.add(new Pose(fieldDeltaX, fieldDeltaY,robotPoseDelta.heading));
         updateValues();
     }
@@ -127,6 +131,6 @@ public class Odometry {
 
 
     public String toString() {
-        return "x: " + currX + " y: " + currY +  " heading: " + Math.toDegrees(currHeading);
+        return "curr odom readings: " + currentPosition.toString();
     }
 }

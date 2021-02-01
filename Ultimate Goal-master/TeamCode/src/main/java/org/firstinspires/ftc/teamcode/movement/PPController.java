@@ -102,7 +102,7 @@ public class PPController {
 
         movementTurn = Range.clip(movementTurnSpeed, -turnSpeed, turnSpeed);
 
-        if(distance < 3.9) {
+        if(distance < 2) {
             movementTurn = 0;
         }
 
@@ -146,13 +146,6 @@ public class PPController {
 
 
 
-//    public static void followCurve(ArrayList<CurvePoint> allPoints, double followAngle) {
-//        CurvePoint followMe = getFollowPointPath(allPoints, currentPosition.x, currentPosition.y, allPoints.get(0).followDistance);
-//
-//        goToPosition(followMe.x, followMe.y, followMe.moveSpeed, followAngle, followMe.turnSpeed, followMe.slowDownTurnRadians, followMe.slowDownTurnAmount, false);
-//    }
-
-
     public static boolean followCurve(ArrayList<CurvePoint> allPoints, double followAngle){
 
         //now we will extend the last line so that the pointing looks smooth at the end
@@ -189,7 +182,7 @@ public class PPController {
 
 
 
-        if(clipedDistToFinalEnd <= followMe.followDistance + 6 || // TODO: EDIT END DIST (6)
+        if(clipedDistToFinalEnd <= followMe.followDistance + 6 ||
                 Math.hypot(currentPosition.x-allPoints.get(allPoints.size()-1).x,
                         currentPosition.y-allPoints.get(allPoints.size()-1).y) < followMe.followDistance + 6){
 
@@ -216,7 +209,7 @@ public class PPController {
 
 
 
-        return clipedDistToFinalEnd < 4;//if we are less than 10 cm to the target, return true
+        return clipedDistToFinalEnd < 2;//if we are less than 10 cm to the target, return true
     }
 
 

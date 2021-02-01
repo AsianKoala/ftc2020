@@ -15,24 +15,6 @@ import java.util.ArrayList;
 
 public class PPController {
 
-    public static final double smallAdjustSpeed = 0.135; // TODO: diff vals
-
-    public enum profileStates {
-        gunningIt,
-        fineAdjustment;
-
-        private static profileStates[] vals = values();
-        public profileStates next(){
-            return vals[(this.ordinal()+1) % vals.length];
-        }
-    }
-
-    private static profileStates y_movement_state = profileStates.gunningIt;
-    private static profileStates x_movement_state = profileStates.gunningIt;
-    private static profileStates turn_movement_state = profileStates.gunningIt;
-
-
-
     public static double movement_y_min = 0.091;
     public static double movement_x_min = 0.11;
     public static double movement_turn_min = 0.10;
@@ -63,7 +45,7 @@ public class PPController {
         return val;
     }
 
-   
+
 
     public static class movementResult{
         public double turnDelta_rad;
@@ -156,8 +138,7 @@ public class PPController {
         //smooths down the last bit to finally settle on an angle
         movementTurn *= Range.clip(Math.abs(relativePointAngle)/Math.toRadians(3),0,1);
 
-        movementResult r = new movementResult(relativePointAngle);
-        return r;
+        return new movementResult(relativePointAngle);
     }
 
 
@@ -242,13 +223,10 @@ public class PPController {
 
     /**
      * This will extend a line by a distance. It will modify only the second point
-     * @param firstPoint
-     * @param secondPoint
-     * @return a new curve point that is a replacement for the second point
      */
     private static CurvePoint extendLine(CurvePoint firstPoint, CurvePoint secondPoint, double distance) {
 
-        /**
+        /*
          * Since we are pointing to this point, extend the line if it is the last line
          * but do nothing if it isn't the last line
          *

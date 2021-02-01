@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.movement.CurvePoint;
-import org.firstinspires.ftc.teamcode.movement.Odometry;
+import static org.firstinspires.ftc.teamcode.movement.Odometry.*;
 import org.firstinspires.ftc.teamcode.movement.PPController;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
 import org.firstinspires.ftc.teamcode.util.Point;
@@ -53,7 +53,7 @@ public class TestAuto extends Auto {
             }
 
             DriveTrain.movementY = 0.5;
-            if(Math.abs(startStageY - Odometry.currentPosition.y) > 5) {
+            if(Math.abs(startStageY - currentPosition.y) > 5) {
                 DriveTrain.stopMovement();
                 nextStage();
             }
@@ -65,7 +65,7 @@ public class TestAuto extends Auto {
             }
 
             DriveTrain.movementTurn = 0.3;
-            if(Math.abs(Math.toDegrees(MathUtil.angleWrap(startStageHeading - Odometry.currentPosition.heading))) > 45) {
+            if(Math.abs(Math.toDegrees(MathUtil.angleWrap(startStageHeading - currentPosition.heading))) > 45) {
                 DriveTrain.stopMovement();
                 nextStage();
             }
@@ -82,13 +82,13 @@ public class TestAuto extends Auto {
 //                DriveTrain.stopMovement();
 
             ArrayList<CurvePoint> allPoints = new ArrayList<>();
-            allPoints.add(new CurvePoint(0, 0, 0.75, 0.75, 20, Math.toRadians(30), 1.0));
-            allPoints.add(new CurvePoint(9, 27, 0.75, 0.75, 20, Math.toRadians(30), 1.0));
-            allPoints.add(new CurvePoint(36, 36, 0.75, 0.75, 20, Math.toRadians(30), 1.0));
+            allPoints.add(new CurvePoint(0, 0, 0.75, 0.75, 20, 20, Math.toRadians(30), 1.0));
+            allPoints.add(new CurvePoint(9, 27, 0.75, 0.75, 20, 20, Math.toRadians(30), 1.0));
+            allPoints.add(new CurvePoint(36, 36, 0.75, 0.75, 20, 20, Math.toRadians(30), 1.0));
 
             PPController.followCurve(allPoints, Math.toRadians(90));
 
-            if(Odometry.currentPosition.distance(new Point(36, 36)) < 1) {
+            if(currentPosition.distance(new Point(36, 36)) < 1) {
                 DriveTrain.stopMovement();
             }
         }

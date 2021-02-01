@@ -29,7 +29,6 @@ public class Robot extends TunableOpMode {
     public OdometrySet odometrySet;
     private BNO055IMU imu;
     private double headingOffset;
-    private double lastHeading;
 
 
     @Override
@@ -65,8 +64,8 @@ public class Robot extends TunableOpMode {
     public void loop() {
         driveTrain.update();
 
-        lastHeading = imu.getAngularOrientation().firstAngle - headingOffset;
-        odometry.update(MathUtil.angleWrap(lastHeading + odometry.startHeading));
+        double lastHeading = imu.getAngularOrientation().firstAngle - headingOffset;
+        odometry.update(MathUtil.angleWrap(lastHeading + Odometry.startHeading));
         telemetry.addLine(odometry.toString());
     }
 

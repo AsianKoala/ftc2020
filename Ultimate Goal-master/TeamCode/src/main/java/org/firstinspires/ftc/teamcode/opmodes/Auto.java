@@ -4,6 +4,8 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import org.firstinspires.ftc.teamcode.movement.Odometry;
 import org.firstinspires.ftc.teamcode.util.Pose;
 
+import static org.firstinspires.ftc.teamcode.movement.Odometry.*;
+
 public class Auto extends Robot {
 
     public int progStage;
@@ -26,13 +28,11 @@ public class Auto extends Robot {
     protected double startStageHeading;
     protected Pose startStagePose;
     protected void initProgVars() {
-        startStageX = Odometry.currentPosition.x;
-        startStageY = Odometry.currentPosition.y;
-        startStageHeading = Odometry.currentPosition.heading;
+        startStageX = currentPosition.x;
+        startStageY = currentPosition.y;
+        startStageHeading = currentPosition.heading;
         startStagePose = new Pose(startStageX, startStageY, startStageHeading);
         stageFinished = false;
-//        PPController.initCurve();
-//        PPController.initMove();
     }
 
     @Override

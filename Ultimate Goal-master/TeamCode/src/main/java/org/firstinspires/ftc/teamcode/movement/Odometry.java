@@ -12,11 +12,11 @@ public class Odometry {
     // 8192 / 7.42107016631 = ticks per inch
     public static final double TICKS_PER_INCH = 1103.8839;
 
-    public double startHeading;
     private int prevVertical;
     private int prevHorizontal;
     private double prevHeading;
 
+    public static double startHeading;
     public static Pose currentPosition;
 
     private OdometrySet odometrySet;

@@ -13,10 +13,6 @@ import java.util.Arrays;
 
 
 public class Odometry {
-    public static double currX;
-    public static double currY;
-    public static double currHeading;
-    public static Pose currPose;
     // 8192 ticks per revolution
     // wheels are 60mm, or 2.3622 inches diameter
     // 2.3622 * pi = 7.42107016631 circumference
@@ -32,7 +28,7 @@ public class Odometry {
     private int prevHorizontal;
     private double prevHeading;
 
-    private Pose currentPosition;
+    public static Pose currentPosition;
 
     private OdometrySet odometrySet;
 
@@ -70,7 +66,6 @@ public class Odometry {
         this.odometrySet = odometrySet;
 
         currentPosition = start;
-        updateValues();
     }
 
     public static double encoderTicksToInches(int ticks, double ticksPerInch) {
@@ -78,56 +73,60 @@ public class Odometry {
     }
 
     public void update(double heading) {
-        double[] deltas = new double[] {
-                encoderTicksToInches(odometrySet.getHorizontalTicks() - prevHorizontal,
-                        TICKS_PER_INCH),
-                encoderTicksToInches(odometrySet.getVerticalTicks() - prevVertical,
-                        TICKS_PER_INCH),
-                MathUtil.angleWrap(heading - prevHeading)
-        };
-        System.out.println(Arrays.toString(deltas));
-        opMode.telemetry.addLine("odom deltas: " + Arrays.toString(deltas));
-        prevVertical = odometrySet.getVerticalTicks();
+//        double[] deltas = new double[] {
+//                encoderTicksToInches(odometrySet.getHorizontalTicks() - prevHorizontal,
+//                        TICKS_PER_INCH),
+//                encoderTicksToInches(odometrySet.getVerticalTicks() - prevVertical,
+//                        TICKS_PER_INCH),
+//                MathUtil.angleWrap(heading - prevHeading)
+//        };
+//        System.out.println(Arrays.toString(deltas));
+//        opMode.telemetry.addLine("odom deltas: " + Arrays.toString(deltas));
+//        prevVertical = odometrySet.getVerticalTicks();
+//        prevHorizontal = odometrySet.getHorizontalTicks();
+//        prevHeading = heading;
+//        updateFromRelative(deltas);
+
+        double deltaY = (odometrySet.getVerticalTicks() - prevVertical) / TICKS_PER_INCH;
+        double deltaX = (odometrySet.getHorizontalTicks() - prevHorizontal) / TICKS_PER_INCH;
+        double deltaAngle = MathUtil.angleWrap(heading - prevHeading);
+
+        double newHeading = MathUtil.angleWrap(currentPosition.heading + deltaAngle);
+        currentPosition.x += - (Math.cos(newHeading) * deltaY) + (Math.sin(newHeading) * deltaX);
+        currentPosition.y += - (Math.sin(newHeading) * deltaY) - (Math.cos(newHeading) * deltaX);
+        currentPosition.heading = newHeading;
+
         prevHorizontal = odometrySet.getHorizontalTicks();
-        prevHeading = heading;
-        updateFromRelative(deltas);
+        prevVertical = odometrySet.getVerticalTicks();
+        prevHeading = currentPosition.heading;
+
+        Pose deltaPose = new Pose(deltaX, deltaY, deltaAngle);
+        opMode.telemetry.addLine(deltaPose.toString());
     }
 
-    public void updateFromRelative(double[] deltas) {
+//    public void updateFromRelative(double[] deltas) {
+//
+//        RealMatrix m = MatrixUtils.createRealMatrix(new double[][] {deltas});
+//
+//        RealMatrix rawPoseDelta = forwardSolver.solve(m.transpose());
+//        Pose robotPoseDelta = new Pose(
+//                rawPoseDelta.getEntry(0, 0),
+//                rawPoseDelta.getEntry(1, 0),
+//                rawPoseDelta.getEntry(2, 0)
+//        );
+//
+//        opMode.telemetry.addLine("raw pose deltas: " + robotPoseDelta.toString());
+////        double deltaX = odometrySet.getHorizontalTicks() - prev
+//
+//        double newHeading = MathUtil.angleWrap(currentPosition.heading + robotPoseDelta.heading);
+//        double fieldDeltaX = (Math.cos(newHeading) * robotPoseDelta.y) + (Math.sin(newHeading) * robotPoseDelta.x);
+//        double fieldDeltaY = (Math.sin(newHeading) * robotPoseDelta.y) - (Math.cos(newHeading) * robotPoseDelta.x);
+//        Pose addPose = new Pose(fieldDeltaX, fieldDeltaY, robotPoseDelta.heading);
+//
+//        opMode.telemetry.addLine("field deltas: " + addPose.toString());
+//        currentPosition.add(new Pose(fieldDeltaX, fieldDeltaY,robotPoseDelta.heading));
+//    }
 
-        RealMatrix m = MatrixUtils.createRealMatrix(new double[][] {deltas});
-
-        RealMatrix rawPoseDelta = forwardSolver.solve(m.transpose());
-        Pose robotPoseDelta = new Pose(
-                rawPoseDelta.getEntry(0, 0),
-                rawPoseDelta.getEntry(1, 0),
-                rawPoseDelta.getEntry(2, 0)
-        );
-
-        opMode.telemetry.addLine("raw pose deltas: " + robotPoseDelta.toString());
-//        double deltaX = odometrySet.getHorizontalTicks() - prev
-
-        double newHeading = MathUtil.angleWrap(currentPosition.heading + robotPoseDelta.heading);
-        double fieldDeltaX = (Math.cos(newHeading) * robotPoseDelta.y) + (Math.sin(newHeading) * robotPoseDelta.x);
-        double fieldDeltaY = (Math.sin(newHeading) * robotPoseDelta.y) - (Math.cos(newHeading) * robotPoseDelta.x);
-        Pose addPose = new Pose(fieldDeltaX, fieldDeltaY, robotPoseDelta.heading);
-
-        opMode.telemetry.addLine("field deltas: " + addPose.toString());
-        currentPosition.add(new Pose(fieldDeltaX, fieldDeltaY,robotPoseDelta.heading));
-        updateValues();
-    }
-
-    public void setCurrentPosition(Pose startPosition) {
-        currentPosition = startPosition;
-        updateValues();
-    }
-
-    private void updateValues() {
-        currX = currentPosition.x;
-        currY = currentPosition.y;
-        currHeading = currentPosition.heading;
-        currPose = currentPosition;
-    }
 
 
     public String toString() {

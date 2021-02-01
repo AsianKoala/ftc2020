@@ -27,9 +27,9 @@ public class Auto extends Robot {
     protected double startStageHeading;
     protected Pose startStagePose;
     protected void initProgVars() {
-        startStageX = Odometry.currX;
-        startStageY = Odometry.currY;
-        startStageHeading = Odometry.currHeading;
+        startStageX = Odometry.currentPosition.x;
+        startStageY = Odometry.currentPosition.y;
+        startStageHeading = Odometry.currentPosition.heading;
         startStagePose = new Pose(startStageX, startStageY, startStageHeading);
         stageFinished = false;
 //        PPController.initCurve();

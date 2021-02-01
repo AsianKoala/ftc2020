@@ -80,7 +80,7 @@ public class TestAuto extends Auto {
 
             PPController.goToPosition(12, 12, 0.5, this);
 
-            if(Odometry.currPose.distanceBetween(new Pose(12,12,0)) < 1)
+            if(Odometry.currentPosition.distanceBetween(new Pose(12,12,0)) < 1)
                 DriveTrain.stopMovement();
         }
 

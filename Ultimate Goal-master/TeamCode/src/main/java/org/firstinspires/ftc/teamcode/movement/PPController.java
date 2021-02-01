@@ -6,7 +6,7 @@ import static org.firstinspires.ftc.teamcode.hardware.Odometry.*;
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.opmodes.Auto;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
-import org.firstinspires.ftc.teamcode.util.Point;
+
 
 import java.util.ArrayList;
 
@@ -67,10 +67,10 @@ public class PPController {
 
 
     public static void goToPosition(double targetX, double targetY, double moveSpeed, Auto opmode) {
-        double distance = Math.hypot(targetX - currX, targetY - currY);
+        double distance = Math.hypot(targetX - currentPosition.x, targetY - currentPosition.y);
 
-        double absoluteAngleToTargetPoint = Math.atan2(targetY - currY, targetX - currX);
-        double relativeAngleToTargetPoint = MathUtil.angleWrap(absoluteAngleToTargetPoint - (currHeading - Math.toRadians(90)));
+        double absoluteAngleToTargetPoint = Math.atan2(targetY - currentPosition.y, targetX - currentPosition.x);
+        double relativeAngleToTargetPoint = MathUtil.angleWrap(absoluteAngleToTargetPoint - (currentPosition.heading - Math.toRadians(90)));
 
         double relativeXToPoint = Math.cos(relativeAngleToTargetPoint) * distance;
         double relativeYToPoint = Math.sin(relativeAngleToTargetPoint) * distance;

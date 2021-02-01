@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import static org.firstinspires.ftc.teamcode.hardware.Odometry.*;
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
-import org.firstinspires.ftc.teamcode.opmodes.Auto;
+
 import org.firstinspires.ftc.teamcode.util.MathUtil;
 
 
@@ -66,7 +66,7 @@ public class PPController {
 
 
 
-    public static void goToPosition(double targetX, double targetY, double moveSpeed, Auto opmode) {
+    public static void goToPosition(double targetX, double targetY, double moveSpeed, double prefAngle, double turnSpeed) {
         double distance = Math.hypot(targetX - currentPosition.x, targetY - currentPosition.y);
 
         double absoluteAngleToTargetPoint = Math.atan2(targetY - currentPosition.y, targetX - currentPosition.x);
@@ -79,16 +79,15 @@ public class PPController {
         double movementXPower = relativeXToPoint / v;
         double movementYPower = relativeYToPoint / v;
 
-        movementXPower = Range.clip(movementXPower, -moveSpeed, moveSpeed);
-        movementYPower = Range.clip(movementYPower, -moveSpeed, moveSpeed);
-        DriveTrain.movementX = movementXPower;
-        DriveTrain.movementY = movementYPower;
+        DriveTrain.movementX = movementXPower * moveSpeed;
+        DriveTrain.movementY = movementYPower * moveSpeed;
 
-//        opmode.telemetry.addLine("relativeX: " + relativeXToPoint);
-//        opmode.telemetry.addLine("relativeY: " + relativeYToPoint);
-//        opmode.telemetry.addLine("absoluteAngle: " + absoluteAngleToTargetPoint);
-//        opmode.telemetry.addLine("relativeAngle: " + Math.toDegrees(relativeAngleToTargetPoint));
-//        opmode.telemetry.addLine("xP: " + movementXPower + " yP: " + movementYPower);
+        double relativeTurnAngle  = relativeAngleToTargetPoint - Math.toRadians(180) + prefAngle;
+        DriveTrain.movementTurn = Range.clip(relativeTurnAngle / Math.toRadians(30), -1, 1) * turnSpeed;
+
+        if(distance < 3) {
+            DriveTrain.movementTurn = 0;
+        }
     }
 
 

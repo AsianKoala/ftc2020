@@ -46,7 +46,7 @@ public class Robot extends TunableOpMode {
         ExpansionHubMotor verticalOdometer = hardwareMap.get(ExpansionHubMotor.class, "leftIntake");
         ExpansionHubMotor horizontalOdometer = hardwareMap.get(ExpansionHubMotor.class, "rightIntake");
         odometrySet = new OdometrySet(verticalOdometer, horizontalOdometer);
-        odometry = new Odometry(new Pose(5, 5, Math.toRadians(90)), odometrySet, this);
+        odometry = new Odometry(new Pose(0, 0, Math.toRadians(90)), odometrySet, this);
 
         initBNO055IMU(hardwareMap);
     }
@@ -66,7 +66,6 @@ public class Robot extends TunableOpMode {
         driveTrain.update();
 
         lastHeading = imu.getAngularOrientation().firstAngle - headingOffset;
-
         odometry.update(MathUtil.angleWrap(lastHeading + odometry.startHeading));
         telemetry.addLine(odometry.toString());
     }

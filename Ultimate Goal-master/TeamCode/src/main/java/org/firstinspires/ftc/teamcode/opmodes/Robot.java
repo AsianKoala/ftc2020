@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import net.frogbots.ftcopmodetunercommon.opmode.TunableOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.teamcode.hardware.BetterOdometry;
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
 import org.firstinspires.ftc.teamcode.hardware.Odometry;
@@ -27,7 +26,6 @@ public class Robot extends TunableOpMode {
     public DriveTrain driveTrain;
 
     // odom shit
-    public BetterOdometry betterOdometry;
     public OdometrySet odometrySet;
     private BNO055IMU imu;
     private double headingOffset;
@@ -50,16 +48,13 @@ public class Robot extends TunableOpMode {
         ExpansionHubMotor verticalOdometer = hardwareMap.get(ExpansionHubMotor.class, "leftIntake");
         ExpansionHubMotor horizontalOdometer = hardwareMap.get(ExpansionHubMotor.class, "rightIntake");
         odometrySet = new OdometrySet(verticalOdometer, horizontalOdometer);
-        betterOdometry = new BetterOdometry(odometrySet, new Pose(0, 0, Math.toRadians(90)));
+        odometry = new Odometry(new Pose(5, 5, Math.toRadians(90)), odometrySet, this);
         initBNO055IMU(hardwareMap);
-
-
-        odometry = new Odometry(new Pose(0, 0, Math.toRadians(90)), odometrySet);
     }
 
     @Override
     public void init_loop() {
-        telemetry.addLine(betterOdometry.toString());
+        telemetry.addLine(odometry.toString());
     }
 
     @Override
@@ -71,12 +66,10 @@ public class Robot extends TunableOpMode {
     public void loop() {
         driveTrain.update();
 
-        lastHeading = imu.getAngularOrientation().firstAngle - headingOffset;
-        betterOdometry.update(MathUtil.angleWrap(lastHeading + betterOdometry.startPose.heading));
-        telemetry.addLine(betterOdometry.toString());
+        lastHeading = imu.getAngularOrientation().firstAngle - headingOffset + odometry.startHeading;
 
-        odometry.update(MathUtil.angleWrap(lastHeading + odometry.startHeading));
-        telemetry.addLine();
+        // odometry.update(MathUtil.angleWrap(lastHeading + odometry.startHeading));
+        odometry.update(lastHeading);
         telemetry.addLine(odometry.toString());
     }
 

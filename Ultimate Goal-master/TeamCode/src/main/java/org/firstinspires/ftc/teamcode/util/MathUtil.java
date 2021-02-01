@@ -57,6 +57,9 @@ public class MathUtil {
                 sineTerm * robotPoseDelta.x - cosTerm * robotPoseDelta.y,
                 cosTerm * robotPoseDelta.x + sineTerm * robotPoseDelta.y
         );
+        // fieldDeltaX = 1 * dX - 0 * dY
+        // fieldDeltaY = 0 * dX + 1 * dY
+        // fieldDeltaX = dX, fieldDeltaY = dY
 
         Pose fieldPoseDelta = new Pose(fieldPositionDelta.rotated(fieldPose.heading), robotPoseDelta.heading);
 

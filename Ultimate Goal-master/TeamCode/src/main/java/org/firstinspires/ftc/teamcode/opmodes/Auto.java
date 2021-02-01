@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static org.firstinspires.ftc.teamcode.hardware.BetterOdometry.worldPose;
 
+import org.firstinspires.ftc.teamcode.hardware.Odometry;
 import org.firstinspires.ftc.teamcode.movement.PPController;
 import org.firstinspires.ftc.teamcode.util.Pose;
 
@@ -27,13 +27,13 @@ public class Auto extends Robot {
     protected double startStageHeading;
     protected Pose startStagePose;
     protected void initProgVars() {
-        startStageX = worldPose.x;
-        startStageY = worldPose.y;
-        startStageHeading = worldPose.heading;
+        startStageX = Odometry.currX;
+        startStageY = Odometry.currY;
+        startStageHeading = Odometry.currHeading;
         startStagePose = new Pose(startStageX, startStageY, startStageHeading);
         stageFinished = false;
-        PPController.initCurve();
-        PPController.initMove();
+//        PPController.initCurve();
+//        PPController.initMove();
     }
 
     @Override

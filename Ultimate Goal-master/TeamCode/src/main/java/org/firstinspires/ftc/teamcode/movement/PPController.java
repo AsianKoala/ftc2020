@@ -187,7 +187,7 @@ public class PPController {
 
 
 
-        if(clipedDistToFinalEnd <= followMe.followDistance + 6 ||
+        if(clipedDistToFinalEnd <= followMe.followDistance + 6 || // TODO: EDIT END DIST (6)
                 Math.hypot(currentPosition.x-allPoints.get(allPoints.size()-1).x,
                         currentPosition.y-allPoints.get(allPoints.size()-1).y) < followMe.followDistance + 6){
 
@@ -214,7 +214,7 @@ public class PPController {
 
 
 
-        return clipedDistToFinalEnd < 4;//if we are less than 10 cm to the target, return true
+        return clipedDistToFinalEnd < 2;//if we are less than 10 cm to the target, return true
     }
 
 

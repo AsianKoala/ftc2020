@@ -77,19 +77,18 @@ public class TestAuto extends Auto {
             }
 
 
-//            PPController.goToPosition(36, 36, 0.75, Math.toRadians(90), 0.75, Math.toRadians(15), 0, false);
-//            if(Odometry.currentPosition.distanceBetween(new Pose(-24,24,0)) < 1)
-//                DriveTrain.stopMovement();
+//            PPController.goToPosition(36, 36, 0.75, Math.toRadians(90), 0.75, Math.toRadians(60), 0, false);
 
             ArrayList<CurvePoint> allPoints = new ArrayList<>();
-            allPoints.add(new CurvePoint(0, 0, 0.75, 0.75, 20, 20, Math.toRadians(30), 1.0));
-            allPoints.add(new CurvePoint(9, 27, 0.75, 0.75, 20, 20, Math.toRadians(30), 1.0));
-            allPoints.add(new CurvePoint(36, 36, 0.75, 0.75, 20, 20, Math.toRadians(30), 1.0));
+            allPoints.add(new CurvePoint(0, 0, 0, 0, 0, 0, 0, 0));
+            allPoints.add(new CurvePoint(9, 27, 0.75, 0.75, 20, 20, Math.toRadians(60), 0.5));
+            allPoints.add(new CurvePoint(36, 36, 0.75, 0.75, 20, 20, Math.toRadians(60), 0.5));
+            allPoints.add(new CurvePoint(50, 36, 0.75, 0.75, 20, 20, Math.toRadians(60), 0));
+            boolean complete = PPController.followCurve(allPoints, Math.toRadians(90));
 
-            PPController.followCurve(allPoints, Math.toRadians(90));
-
-            if(currentPosition.distance(new Point(36, 36)) < 1) {
+            if(complete) {
                 DriveTrain.stopMovement();
+                nextStage();
             }
         }
 

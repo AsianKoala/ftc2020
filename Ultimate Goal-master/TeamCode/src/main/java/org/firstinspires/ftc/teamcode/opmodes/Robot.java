@@ -18,7 +18,6 @@ import org.firstinspires.ftc.teamcode.util.MathUtil;
 import org.firstinspires.ftc.teamcode.util.Pose;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
-import static org.firstinspires.ftc.teamcode.util.MathUtil.angleWrap;
 
 
 public class Robot extends TunableOpMode {
@@ -31,7 +30,6 @@ public class Robot extends TunableOpMode {
     private BNO055IMU imu;
     private double headingOffset;
     private double lastHeading;
-
 
 
     @Override
@@ -69,7 +67,6 @@ public class Robot extends TunableOpMode {
 
         lastHeading = imu.getAngularOrientation().firstAngle - headingOffset;
 
-        // odometry.update(MathUtil.angleWrap(lastHeading + odometry.startHeading));
         odometry.update(MathUtil.angleWrap(lastHeading + odometry.startHeading));
         telemetry.addLine(odometry.toString());
     }

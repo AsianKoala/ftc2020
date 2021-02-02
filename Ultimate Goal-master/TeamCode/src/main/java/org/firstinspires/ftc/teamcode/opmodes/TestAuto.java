@@ -54,9 +54,11 @@ public class TestAuto extends Auto {
 
             ArrayList<CurvePoint> allPoints = new ArrayList<>();
             allPoints.add(new CurvePoint(0, 0, 0, 0, 0, 0, 0, 0));
+            allPoints.add(new CurvePoint(0, 15, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
+            allPoints.add(new CurvePoint(5, 23, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
             allPoints.add(new CurvePoint(9, 27, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
-            allPoints.add(new CurvePoint(36, 36, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
-            allPoints.add(new CurvePoint(45, 36, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
+            allPoints.add(new CurvePoint(24, 36, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
+            allPoints.add(new CurvePoint(60, 40, 0.5, 0.5, 20, 15, Math.toRadians(30), 0.6));
             boolean complete = PPController.followCurve(allPoints, Math.toRadians(90));
 
             if(complete) {
@@ -72,9 +74,11 @@ public class TestAuto extends Auto {
 
             ArrayList<CurvePoint> allPoints = new ArrayList<>();
             allPoints.add(new CurvePoint(startStageX, startStageY, 0, 0, 0, 0, 0, 0));
-            allPoints.add(new CurvePoint(36, 36, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
+            allPoints.add(new CurvePoint(24, 36, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
             allPoints.add(new CurvePoint(9, 27, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
-            allPoints.add(new CurvePoint(0, 0, 0.5, 0.5, 20, 25, Math.toRadians(60), 0));
+            allPoints.add(new CurvePoint(5, 23, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
+            allPoints.add(new CurvePoint(0, 15, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
+            allPoints.add(new CurvePoint(5, -7, 0.4, 0.6, 20, 15, Math.toRadians(30), 0.6));
             boolean complete = PPController.followCurve(allPoints, Math.toRadians(90));
 
             if(complete) {
@@ -90,7 +94,7 @@ public class TestAuto extends Auto {
 
             PPController.pointAngle(Math.toRadians(90), 0.5, Math.toRadians(30));
 
-            if(Math.abs(MathUtil.angleWrap(Odometry.currentPosition.heading - Math.toRadians(90))) < Math.toRadians(3)) {
+            if(Math.abs(MathUtil.angleWrap(Odometry.currentPosition.heading - Math.toRadians(90))) < Math.toRadians(2)) {
                 DriveTrain.stopMovement();
                 requestOpModeStop();
             }

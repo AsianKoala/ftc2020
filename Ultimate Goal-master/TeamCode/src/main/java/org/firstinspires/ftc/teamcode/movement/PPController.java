@@ -125,25 +125,6 @@ public class PPController {
         movementY *= errorTurnSoScaleDownMovement;
     }
 
-    public static movementResult pointAngle(double point_angle, double point_speed, double decelerationRadians) {
-        //now that we know what absolute angle to point to, we calculate how close we are to it
-        double relativePointAngle = MathUtil.angleWrap(point_angle-currentPosition.heading);
-
-        //Scale down the relative angle by 40 and multiply by point speed
-        double turnSpeed = (relativePointAngle/decelerationRadians)*point_speed;
-        //now just clip the result to be in range
-        movementTurn = Range.clip(turnSpeed,-point_speed,point_speed);
-
-        //make sure the largest component doesn't fall below it's minimum power
-        allComponentsMinPower();
-
-        //smooths down the last bit to finally settle on an angle
-        movementTurn *= Range.clip(Math.abs(relativePointAngle)/Math.toRadians(3),0,1);
-
-        return new movementResult(relativePointAngle);
-    }
-
-
 
 
     public static boolean followCurve(ArrayList<CurvePoint> allPoints, double followAngle){
@@ -160,7 +141,8 @@ public class PPController {
                 allPoints.get(currFollowIndex).followDistance);
 
 
-
+        // test from ehre
+        CurvePoint realLastPoint = allPoints.get(allPoints.size()-1);
         //this will change the last point to be extended
         pathExtended.set(pathExtended.size()-1,
                 extendLine(allPoints.get(allPoints.size()-2),allPoints.get(allPoints.size()-1),
@@ -209,11 +191,27 @@ public class PPController {
 
 
 
-        return clipedDistToFinalEnd < 4;//if we are less than 10 cm to the target, return true
+        return clipedDistToFinalEnd < 2;// 4
     }
 
 
+    public static movementResult pointAngle(double point_angle, double point_speed, double decelerationRadians) {
+        //now that we know what absolute angle to point to, we calculate how close we are to it
+        double relativePointAngle = MathUtil.angleWrap(point_angle-currentPosition.heading);
 
+        //Scale down the relative angle by 40 and multiply by point speed
+        double turnSpeed = (relativePointAngle/decelerationRadians)*point_speed;
+        //now just clip the result to be in range
+        movementTurn = Range.clip(turnSpeed,-point_speed,point_speed);
+
+        //make sure the largest component doesn't fall below it's minimum power
+        allComponentsMinPower();
+
+        //smooths down the last bit to finally settle on an angle
+        movementTurn *= Range.clip(Math.abs(relativePointAngle)/Math.toRadians(3),0,1);
+
+        return new movementResult(relativePointAngle);
+    }
 
 
     /**
@@ -332,5 +330,18 @@ public class PPController {
 
 
 
+    public static ArrayList<CurvePoint> reversePath(ArrayList<CurvePoint> pathPoints, double xComp, double yComp) {
+        ArrayList<CurvePoint> allPoints = new ArrayList<>();
+        allPoints.add(new CurvePoint(currentPosition.x, currentPosition.y, 0, 0, 0, 0, 0, 0));
+
+        for(int i=pathPoints.size()-2; i>0; i--) {
+            allPoints.add(pathPoints.get(i));
+        }
+        CurvePoint lastPoint = new CurvePoint(pathPoints.get(0).x + xComp, pathPoints.get(0).y + yComp,
+                0.4, 0.6, 20, 15, Math.toRadians(30), 0.6);
+        allPoints.add(lastPoint);
+
+        return allPoints;
+    }
 
 }

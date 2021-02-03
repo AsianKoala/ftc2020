@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.movement.Odometry;
 import org.firstinspires.ftc.teamcode.movement.PPController;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
@@ -51,14 +52,14 @@ public class TestAuto extends Auto {
                 initProgVars();
             }
 
-
             ArrayList<CurvePoint> allPoints = new ArrayList<>();
             allPoints.add(new CurvePoint(0, 0, 0, 0, 0, 0, 0, 0));
-            allPoints.add(new CurvePoint(0, 15, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
-            allPoints.add(new CurvePoint(5, 23, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
-            allPoints.add(new CurvePoint(9, 27, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
-            allPoints.add(new CurvePoint(24, 36, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
-            allPoints.add(new CurvePoint(60, 40, 0.5, 0.5, 20, 15, Math.toRadians(30), 0.6));
+            allPoints.add(new CurvePoint(0, 15, 0.4, 0.4, 20, 25, Math.toRadians(60), 0.6));
+            allPoints.add(new CurvePoint(5, 23, 0.4, 0.4, 20, 25, Math.toRadians(60), 0.6));
+            allPoints.add(new CurvePoint(9, 27, 0.4, 0.4, 20, 25, Math.toRadians(60), 0.6));
+            allPoints.add(new CurvePoint(24, 36, 0.4, 0.4, 20, 25, Math.toRadians(60), 0.6));
+            allPoints.add(new CurvePoint(40, 40, 0.4, 0.4, 20, 25, Math.toRadians(60), 0.6));
+            allPoints.add(new CurvePoint(60, 40, 0.4, 0.4, 20, 25, Math.toRadians(30), 0.6));
             boolean complete = PPController.followCurve(allPoints, Math.toRadians(90));
 
             if(complete) {
@@ -72,13 +73,18 @@ public class TestAuto extends Auto {
                 initProgVars();
             }
 
+            // curr: same pointLength and followDistance as everything else, lowered distance to 2, (distance may fuck everything upp, try to change back to 4 after)
+            // next: have goToPosition slow down when it is <12 inches away from the REAL last point, not extended
+            // next:
+
             ArrayList<CurvePoint> allPoints = new ArrayList<>();
             allPoints.add(new CurvePoint(startStageX, startStageY, 0, 0, 0, 0, 0, 0));
-            allPoints.add(new CurvePoint(24, 36, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
-            allPoints.add(new CurvePoint(9, 27, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
-            allPoints.add(new CurvePoint(5, 23, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
-            allPoints.add(new CurvePoint(0, 15, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
-            allPoints.add(new CurvePoint(5, -7, 0.4, 0.6, 20, 15, Math.toRadians(30), 0.6));
+            allPoints.add(new CurvePoint(40, 40, 0.4, 0.4, 20, 25, Math.toRadians(60), 0.6));
+            allPoints.add(new CurvePoint(24, 36, 0.4, 0.4, 20, 25, Math.toRadians(60), 0.6));
+            allPoints.add(new CurvePoint(9, 27, 0.4, 0.4, 20, 25, Math.toRadians(60), 0.6));
+            allPoints.add(new CurvePoint(5, 23, 0.4, 0.4, 20, 25, Math.toRadians(60), 0.6));
+            allPoints.add(new CurvePoint(0, 15, 0.4, 0.4, 20, 25, Math.toRadians(60), 0.6));
+            allPoints.add(new CurvePoint(5, -7, 0.4, 0.4, 20, 25, Math.toRadians(30), 0.6));
             boolean complete = PPController.followCurve(allPoints, Math.toRadians(90));
 
             if(complete) {
@@ -94,7 +100,7 @@ public class TestAuto extends Auto {
 
             PPController.pointAngle(Math.toRadians(90), 0.5, Math.toRadians(30));
 
-            if(Math.abs(MathUtil.angleWrap(Odometry.currentPosition.heading - Math.toRadians(90))) < Math.toRadians(2)) {
+            if(Math.abs(MathUtil.angleWrap(Odometry.currentPosition.heading - Math.toRadians(90))) < Math.toRadians(1)) {
                 DriveTrain.stopMovement();
                 requestOpModeStop();
             }

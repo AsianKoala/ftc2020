@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.movement;
 import org.firstinspires.ftc.teamcode.opmodes.Robot;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
 import org.firstinspires.ftc.teamcode.util.Pose;
+import org.jetbrains.annotations.NotNull;
 
 
 public class Odometry {
@@ -19,14 +20,10 @@ public class Odometry {
     public static double startHeading;
     public static Pose currentPosition;
 
-    private OdometrySet odometrySet;
-
-    private Robot opMode;
+    private final OdometrySet odometrySet;
 
 
-    public Odometry(Pose start, OdometrySet odometrySet, Robot opMode) {
-        this.opMode = opMode;
-
+    public Odometry(Pose start, OdometrySet odometrySet) {
         startHeading = start.heading;
         prevHorizontal = 0;
         prevVertical = 0;
@@ -36,6 +33,11 @@ public class Odometry {
         currentPosition = start;
     }
 
+    public void setStart(Pose start) {
+        startHeading = start.heading;
+        prevHeading = startHeading;
+        currentPosition = start;
+    }
 
     public void update(double heading) {
         double deltaY = (odometrySet.getVerticalTicks() - prevVertical) / TICKS_PER_INCH;
@@ -53,6 +55,7 @@ public class Odometry {
     }
 
 
+    @NotNull
     public String toString() {
         return "curr odom readings: " + currentPosition.toString();
     }

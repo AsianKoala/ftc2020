@@ -10,6 +10,8 @@ import net.frogbots.ftcopmodetunercommon.opmode.TunableOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
+import org.firstinspires.ftc.teamcode.hardware.Intake;
+import org.firstinspires.ftc.teamcode.hardware.Shooter;
 import org.firstinspires.ftc.teamcode.movement.Odometry;
 import org.firstinspires.ftc.teamcode.movement.OdometrySet;
 import org.firstinspires.ftc.teamcode.util.AxesSigns;
@@ -23,6 +25,8 @@ import org.openftc.revextensions2.ExpansionHubMotor;
 public class Robot extends TunableOpMode {
 
     public DriveTrain driveTrain;
+    public Intake intake;
+    public Shooter shooter;
 
     // odom shit
     public Odometry odometry;
@@ -45,9 +49,11 @@ public class Robot extends TunableOpMode {
         ExpansionHubMotor verticalOdometer = hardwareMap.get(ExpansionHubMotor.class, "leftIntake");
         ExpansionHubMotor horizontalOdometer = hardwareMap.get(ExpansionHubMotor.class, "rightIntake");
         odometrySet = new OdometrySet(verticalOdometer, horizontalOdometer);
-        odometry = new Odometry(new Pose(0, 0, Math.toRadians(90)), odometrySet, this);
-
+        odometry = new Odometry(new Pose(0, 0, Math.toRadians(90)), odometrySet);
         initBNO055IMU(hardwareMap);
+
+        intake = new Intake(null, null);
+        shooter = new Shooter(null, null);
     }
 
     @Override

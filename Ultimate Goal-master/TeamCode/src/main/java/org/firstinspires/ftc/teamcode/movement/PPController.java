@@ -191,7 +191,7 @@ public class PPController {
 
 
 
-        return clipedDistToFinalEnd < 4;// 4
+        return clipedDistToFinalEnd < 3;// 4
     }
 
 
@@ -211,6 +211,11 @@ public class PPController {
         movementTurn *= Range.clip(Math.abs(relativePointAngle)/Math.toRadians(3),0,1);
 
         return new movementResult(relativePointAngle);
+    }
+
+    public static movementResult pointPointTurn(Point point, double point_speed, double decelerationRadians) {
+        double absoluteAngleToTargetPoint = Math.atan2(point.x - currentPosition.y, point.y - currentPosition.x);
+        return pointAngle(absoluteAngleToTargetPoint, point_speed, decelerationRadians);
     }
 
 

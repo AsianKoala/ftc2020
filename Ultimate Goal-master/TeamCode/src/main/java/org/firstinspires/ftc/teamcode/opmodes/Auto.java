@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 
 
+import org.firstinspires.ftc.teamcode.hardware.RingDetector;
 import org.firstinspires.ftc.teamcode.util.Pose;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -54,7 +55,7 @@ public abstract class Auto extends Robot {
         super.init();
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
-        pipeline = new RingDetectorPipeline(true, 30);
+        pipeline = new RingDetectorPipeline(true, 18);
         phoneCam.setPipeline(pipeline);
 
         // fixes the problems we had last year with the camera preview on the phone not being in landscape or whatever
@@ -97,7 +98,7 @@ public abstract class Auto extends Robot {
     static class RingDetectorPipeline extends OpenCvPipeline {
         int colorComponentNum;
         int threshold;
-        RingDetectorPipeline(boolean isCr, int threshold) {
+        public RingDetectorPipeline(boolean isCr, int threshold) {
             colorComponentNum = isCr ? 1 : 2;
             this.threshold = threshold;
         }
@@ -121,12 +122,11 @@ public abstract class Auto extends Robot {
         static final int baseAverage = 128;
 
         // constants for defining the area of rectangles
-        static final Point FOUR_RING_TOP_LEFT_ANCHOR = new Point(100, 75);
-        static final Point ONE_RING_TOP_LEFT_ANCHOR = new Point(100, 125);
-        static final int REC_WIDTH = 100;
-        static final int REC_HEIGHT = 50;
-        static final int ONE_RING_WIDTH = 100;
-        static final int ONE_RING_HEIGHT = 30;
+        static final Point FOUR_RING_TOP_LEFT_ANCHOR = new Point(130, 123);
+        static final Point ONE_RING_TOP_LEFT_ANCHOR = new Point(130, 153);
+        static final int REC_WIDTH = 45;
+        static final int REC_HEIGHT = 30;
+        static final int ONE_RING_HEIGHT = 17;
 
         // using the constants we calculate the points actually used for the rectangles
         // point a would be the top left point, point b would be the bottom right (creating a diagonal)
@@ -134,17 +134,17 @@ public abstract class Auto extends Robot {
         Point four_ring_pointA = FOUR_RING_TOP_LEFT_ANCHOR;
         Point four_ring_pointB = new Point(FOUR_RING_TOP_LEFT_ANCHOR.x + REC_WIDTH, FOUR_RING_TOP_LEFT_ANCHOR.y + REC_HEIGHT);
         Point one_ring_pointA = ONE_RING_TOP_LEFT_ANCHOR;
-        Point one_ring_pointB = new Point(ONE_RING_TOP_LEFT_ANCHOR.x + ONE_RING_WIDTH, ONE_RING_TOP_LEFT_ANCHOR.y + ONE_RING_HEIGHT);
+        Point one_ring_pointB = new Point(ONE_RING_TOP_LEFT_ANCHOR.x + REC_WIDTH, ONE_RING_TOP_LEFT_ANCHOR.y + ONE_RING_HEIGHT);
 
         // computation vars
         // region1 is bound by the first the points
         // region2 is bound by the second 2
-        Mat region1_Cr, region2_Cr;
+        Mat region1_comp, region2_comp;
         Mat YCrCb = new Mat();
         Mat component = new Mat();
         int avg1, avg2;
 
-        private RingAmount ringAmt;
+        RingAmount ringAmt;
 
         // turns rgb input into YCrCb
         void rgbToComponent(Mat input) {
@@ -156,8 +156,8 @@ public abstract class Auto extends Robot {
         public void init(Mat firstFrame) {
             rgbToComponent(firstFrame);
 
-            region1_Cr = component.submat(new Rect(four_ring_pointA, four_ring_pointB));
-            region2_Cr = component.submat(new Rect(one_ring_pointA, one_ring_pointB));
+            region1_comp = component.submat(new Rect(four_ring_pointA, four_ring_pointB));
+            region2_comp = component.submat(new Rect(one_ring_pointA, one_ring_pointB));
         }
 
         @Override
@@ -181,8 +181,8 @@ public abstract class Auto extends Robot {
             rgbToComponent(input);
 
             // get avg of each region
-            avg1 = (int) Core.mean(region1_Cr).val[0];
-            avg2 = (int) Core.mean(region2_Cr).val[0];
+            avg1 = (int) Core.mean(region1_comp).val[0];
+            avg2 = (int) Core.mean(region2_comp).val[0];
             average1 = avg1;
             average2 = avg2;
 
@@ -237,5 +237,4 @@ public abstract class Auto extends Robot {
             return "avg1: " + average1 + " avg2: " + average2  + newLine + " diff1: " + difference1 + " diff2: " + difference2;
         }
     }
-
 }

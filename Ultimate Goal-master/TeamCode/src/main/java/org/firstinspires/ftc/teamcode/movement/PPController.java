@@ -151,6 +151,79 @@ public class PPController {
     }
 
 
+    public static boolean betterFollowCurve(ArrayList<CurvePoint> allPoints, double followAngle, Point anglePoint, boolean headingControlled){
+
+
+        //now we will extend the last line so that the pointing looks smooth at the end
+        ArrayList<CurvePoint> pathExtended = (ArrayList<CurvePoint>) allPoints.clone();
+
+        //first get which segment we are on
+        indexPoint clippedToPath = clipToFollowPointPath(allPoints,currentPosition.x,currentPosition.y);
+        int currFollowIndex = clippedToPath.index+1;
+
+        //get the point to follow
+        CurvePoint followMe = getFollowPointPath(pathExtended,currentPosition.x,currentPosition.y,
+                allPoints.get(currFollowIndex).followDistance);
+
+
+
+        //this will change the last point to be extended
+        pathExtended.set(pathExtended.size()-1,
+                extendLine(allPoints.get(allPoints.size()-2),allPoints.get(allPoints.size()-1),
+                        allPoints.get(allPoints.size()-1).pointLength * 1.5));
+
+
+
+        //get the point to point to
+        CurvePoint pointToMe = getFollowPointPath(pathExtended,currentPosition.x,currentPosition.y,
+                allPoints.get(currFollowIndex).pointLength);
+
+//        followAngle = Math.atan2(0 - worldYPosition, 0 - worldXPosition);
+
+        //if we are nearing the end (less than the follow dist amount to go) just manualControl point to end
+        //but only if we have passed through the correct points beforehand
+        double clipedDistToFinalEnd = Math.hypot(
+                clippedToPath.point.x-allPoints.get(allPoints.size()-1).x,
+                clippedToPath.point.y-allPoints.get(allPoints.size()-1).y);
+
+
+
+        if(clipedDistToFinalEnd <= followMe.followDistance + 6 ||
+                Math.hypot(currentPosition.x-allPoints.get(allPoints.size()-1).x,
+                        currentPosition.y-allPoints.get(allPoints.size()-1).y) < followMe.followDistance + 6){
+
+            followMe.setPoint(allPoints.get(allPoints.size()-1).toPoint());
+        }
+
+
+
+
+        goToPosition(followMe.x, followMe.y, followAngle,
+                followMe.moveSpeed,followMe.turnSpeed,
+                followMe.slowDownTurnRadians,0.25,true); // 0.275
+
+        //find the angle to that point using atan2
+        double currFollowAngle = Math.atan2(pointToMe.y-currentPosition.y,pointToMe.x-currentPosition.x);
+
+        //if our follow angle is different, point differently
+        currFollowAngle += angleWrap(followAngle - Math.toRadians(90));
+
+        movementResult result;
+        if(headingControlled) {
+            result = pointPointTurn(anglePoint, allPoints.get(currFollowIndex).turnSpeed, Math.toRadians(45));
+        } else {
+            result = pointAngle(currFollowAngle,allPoints.get(currFollowIndex).turnSpeed,Math.toRadians(45));
+        }
+
+        movementX *= 1 - Range.clip(Math.abs(result.turnDelta_rad) / followMe.slowDownTurnRadians,0,followMe.slowDownTurnAmount);
+        movementY *= 1 - Range.clip(Math.abs(result.turnDelta_rad) / followMe.slowDownTurnRadians,0,followMe.slowDownTurnAmount);
+
+        movementX *= Range.clip(Math.abs(allPoints.get(allPoints.size()-1).x-currentPosition.x)/0.787,0.5,1); // 0.787
+        movementY *= Range.clip(Math.abs(allPoints.get(allPoints.size()-1).y-currentPosition.y)/0.787,0.5,1);
+
+        return clipedDistToFinalEnd < 1.181; //3
+    }
+
 
 
     public static boolean followCurve(ArrayList<CurvePoint> allPoints, double followAngle){

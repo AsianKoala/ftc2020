@@ -126,6 +126,97 @@ public class PPController {
     }
 
 
+    public static movementResult pointAngle(double point_angle, double point_speed, double decelerationRadians) {
+        //now that we know what absolute angle to point to, we calculate how close we are to it
+        double relativePointAngle = MathUtil.angleWrap(point_angle-currentPosition.heading);
+
+        //Scale down the relative angle by 40 and multiply by point speed
+        double turnSpeed = (relativePointAngle/decelerationRadians)*point_speed;
+        //now just clip the result to be in range
+        movementTurn = Range.clip(turnSpeed,-point_speed,point_speed);
+
+        //make sure the largest component doesn't fall below it's minimum power
+        allComponentsMinPower();
+
+        //smooths down the last bit to finally settle on an angle
+        movementTurn *= Range.clip(Math.abs(relativePointAngle)/Math.toRadians(3),0,1);
+
+        return new movementResult(relativePointAngle);
+    }
+
+
+    public static movementResult pointPointTurn(Point point, double point_speed, double decelerationRadians) {
+        double absoluteAngleToTargetPoint = Math.atan2(point.x - currentPosition.y, point.y - currentPosition.x);
+        return pointAngle(absoluteAngleToTargetPoint, point_speed, decelerationRadians);
+    }
+
+
+    public static boolean betterFollowCurve(ArrayList<CurvePoint> allPoints, Point anglePoint, double followAngle) {
+        //now we will extend the last line so that the pointing looks smooth at the end
+        ArrayList<CurvePoint> pathExtended = (ArrayList<CurvePoint>) allPoints.clone();
+
+        //first get which segment we are on
+        indexPoint clippedToPath = clipToFollowPointPath(allPoints,currentPosition.x,currentPosition.y);
+        int currFollowIndex = clippedToPath.index+1;
+
+        //get the point to follow
+        CurvePoint followMe = getFollowPointPath(pathExtended,currentPosition.x,currentPosition.y,
+                allPoints.get(currFollowIndex).followDistance);
+
+
+        // test from ehre
+        CurvePoint realLastPoint = allPoints.get(allPoints.size()-1);
+        //this will change the last point to be extended
+        pathExtended.set(pathExtended.size()-1,
+                extendLine(allPoints.get(allPoints.size()-2),allPoints.get(allPoints.size()-1),
+                        allPoints.get(allPoints.size()-1).pointLength * 1.5));
+
+
+
+        //get the point to point to
+        CurvePoint pointToMe = getFollowPointPath(pathExtended,currentPosition.x,currentPosition.y,
+                allPoints.get(currFollowIndex).pointLength);
+
+
+
+        //if we are nearing the end (less than the follow dist amount to go) just manualControl point to end
+        //but only if we have passed through the correct points beforehand
+        double clipedDistToFinalEnd = Math.hypot(
+                clippedToPath.point.x-allPoints.get(allPoints.size()-1).x,
+                clippedToPath.point.y-allPoints.get(allPoints.size()-1).y);
+
+
+
+        if(clipedDistToFinalEnd <= followMe.followDistance + 6 ||
+                Math.hypot(currentPosition.x-allPoints.get(allPoints.size()-1).x,
+                        currentPosition.y-allPoints.get(allPoints.size()-1).y) < followMe.followDistance + 6){
+
+            followMe.setPoint(allPoints.get(allPoints.size()-1).toPoint());
+        }
+
+
+
+
+
+        goToPosition(followMe.x, followMe.y,followAngle,
+                followMe.moveSpeed,followMe.turnSpeed,
+                followMe.slowDownTurnRadians,0,true);
+
+        //find the angle to that point using atan2
+        double currFollowAngle = Math.atan2(pointToMe.y-currentPosition.y,pointToMe.x-currentPosition.x);
+
+        //if our follow angle is different, point differently
+        currFollowAngle += MathUtil.angleWrap(followAngle - Math.toRadians(90));
+
+        movementResult result = pointAngle(Math.atan2(anglePoint.y - currentPosition.y, anglePoint.x - currentPosition.x),allPoints.get(currFollowIndex).turnSpeed,Math.toRadians(45));
+        DriveTrain.movementX *= 1 - Range.clip(Math.abs(result.turnDelta_rad) / followMe.slowDownTurnRadians,0,followMe.slowDownTurnAmount);
+        DriveTrain.movementY *= 1 - Range.clip(Math.abs(result.turnDelta_rad) / followMe.slowDownTurnRadians,0,followMe.slowDownTurnAmount);
+
+
+
+        return clipedDistToFinalEnd < 5.5;// 4
+    }
+
 
     public static boolean followCurve(ArrayList<CurvePoint> allPoints, double followAngle){
 
@@ -191,32 +282,11 @@ public class PPController {
 
 
 
-        return clipedDistToFinalEnd < 3;// 4
+        return clipedDistToFinalEnd < 4;// 4
     }
 
 
-    public static movementResult pointAngle(double point_angle, double point_speed, double decelerationRadians) {
-        //now that we know what absolute angle to point to, we calculate how close we are to it
-        double relativePointAngle = MathUtil.angleWrap(point_angle-currentPosition.heading);
 
-        //Scale down the relative angle by 40 and multiply by point speed
-        double turnSpeed = (relativePointAngle/decelerationRadians)*point_speed;
-        //now just clip the result to be in range
-        movementTurn = Range.clip(turnSpeed,-point_speed,point_speed);
-
-        //make sure the largest component doesn't fall below it's minimum power
-        allComponentsMinPower();
-
-        //smooths down the last bit to finally settle on an angle
-        movementTurn *= Range.clip(Math.abs(relativePointAngle)/Math.toRadians(3),0,1);
-
-        return new movementResult(relativePointAngle);
-    }
-
-    public static movementResult pointPointTurn(Point point, double point_speed, double decelerationRadians) {
-        double absoluteAngleToTargetPoint = Math.atan2(point.x - currentPosition.y, point.y - currentPosition.x);
-        return pointAngle(absoluteAngleToTargetPoint, point_speed, decelerationRadians);
-    }
 
 
     /**

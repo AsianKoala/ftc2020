@@ -2,7 +2,8 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 
 
-import org.firstinspires.ftc.teamcode.hardware.RingDetector;
+
+import org.firstinspires.ftc.teamcode.movement.CurvePoint;
 import org.firstinspires.ftc.teamcode.util.Pose;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -20,6 +21,7 @@ import static org.firstinspires.ftc.teamcode.movement.Odometry.*;
 
 public abstract class Auto extends Robot {
 
+    RingDetectorPipeline.RingAmount ringAmount;
     OpenCvCamera phoneCam;
     RingDetectorPipeline pipeline;
 
@@ -42,12 +44,22 @@ public abstract class Auto extends Robot {
     protected double startStageY;
     protected double startStageHeading;
     protected Pose startStagePose;
+    protected double startStageTime;
     protected void initProgVars() {
         startStageX = currentPosition.x;
         startStageY = currentPosition.y;
         startStageHeading = currentPosition.heading;
         startStagePose = new Pose(startStageX, startStageY, startStageHeading);
         stageFinished = false;
+        startStageTime = System.currentTimeMillis();
+    }
+
+    public boolean timeCheck(double millis) {
+        return System.currentTimeMillis() - startStageTime > millis;
+    }
+
+    public CurvePoint initialCurvePoint() {
+        return new CurvePoint(startStageX, startStageY, startStageHeading, 0, 0, 0, 0, 0);
     }
 
     @Override
@@ -73,13 +85,16 @@ public abstract class Auto extends Robot {
     @Override
     public void init_loop() {
         super.init_loop();
-        telemetry.addLine("Rings: " + pipeline.getRingAmount());
+        ringAmount = pipeline.getRingAmount();
+        telemetry.addLine("Rings: " + ringAmount);
         telemetry.addLine(pipeline.getTelemetry());
     }
 
     @Override
     public void start() {
         super.start();
+        ringAmount = pipeline.getRingAmount();
+
         progState = 0;
         completedStages = 0;
         stageFinished = true;

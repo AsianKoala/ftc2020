@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.movement.PPController;
 import org.firstinspires.ftc.teamcode.util.Point;
 import org.firstinspires.ftc.teamcode.util.Pose;
 
-@TeleOp
+@TeleOp(name="main teleop")
 public class MainTeleOp extends Robot {
     Point anglePoint;
     boolean headingControlled = false;
@@ -17,8 +17,8 @@ public class MainTeleOp extends Robot {
     @Override
     public void init() {
         super.init();
-        odometry.setStart(new Pose(30, 0, Math.toRadians(90)));
-        anglePoint = new Point(24, 72);
+        odometry.setStart(new Pose(0, -63, Math.toRadians(180)));
+        anglePoint = new Point(0,0);
     }
 
     @Override
@@ -34,8 +34,8 @@ public class MainTeleOp extends Robot {
     @Override
     public void loop() {
         super.loop();
-        controlAnglePoint();
         controlMovement();
+        controlAnglePoint();
     }
 
     public void controlMovement() {
@@ -60,13 +60,14 @@ public class MainTeleOp extends Robot {
             anglePoint.y -= 6;
         }
 
-        if(gamepad1.a) {
+        if(gamepad1.y) {
             headingControlled = !headingControlled;
         }
 
         if(headingControlled) {
-            PPController.movementResult result = PPController.pointPointTurn(anglePoint, 0.5, Math.toRadians(45));
+            PPController.movementResult result = PPController.pointPointTurn(anglePoint, 0.6, Math.toRadians(30));
             telemetry.addLine(String.format("movementR: %.2f", Math.toDegrees(result.turnDelta_rad)));
+            telemetry.addLine("anglePoint: " + anglePoint.toString());
         }
     }
 }

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -7,6 +8,7 @@ import org.opencv.core.*;
 import org.openftc.easyopencv.*;
 import org.opencv.imgproc.Imgproc;
 
+@Disabled
 @TeleOp(name="ring detector")
 public class RingDetector extends OpMode {
     // 0 1 4

@@ -146,7 +146,7 @@ public class PPController {
 
 
     public static movementResult pointPointTurn(Point point, double point_speed, double decelerationRadians) {
-        double absoluteAngleToTargetPoint = Math.atan2(point.x - currentPosition.y, point.y - currentPosition.x);
+        double absoluteAngleToTargetPoint = Math.atan2(point.y - currentPosition.y, point.x - currentPosition.x);
         return pointAngle(absoluteAngleToTargetPoint, point_speed, decelerationRadians);
     }
 
@@ -187,12 +187,13 @@ public class PPController {
                 clippedToPath.point.y-allPoints.get(allPoints.size()-1).y);
 
 
-
+        boolean pepega = false;
         if(clipedDistToFinalEnd <= followMe.followDistance + 6 ||
                 Math.hypot(currentPosition.x-allPoints.get(allPoints.size()-1).x,
                         currentPosition.y-allPoints.get(allPoints.size()-1).y) < followMe.followDistance + 6){
-
+            pepega = true;
             followMe.setPoint(allPoints.get(allPoints.size()-1).toPoint());
+
         }
 
 
@@ -200,7 +201,7 @@ public class PPController {
 
         goToPosition(followMe.x, followMe.y, followAngle,
                 followMe.moveSpeed,followMe.turnSpeed,
-                followMe.slowDownTurnRadians,0.25,true); // 0.275
+                followMe.slowDownTurnRadians,0.2,true); // 0.275
 
         //find the angle to that point using atan2
         double currFollowAngle = Math.atan2(pointToMe.y-currentPosition.y,pointToMe.x-currentPosition.x);
@@ -218,10 +219,13 @@ public class PPController {
         movementX *= 1 - Range.clip(Math.abs(result.turnDelta_rad) / followMe.slowDownTurnRadians,0,followMe.slowDownTurnAmount);
         movementY *= 1 - Range.clip(Math.abs(result.turnDelta_rad) / followMe.slowDownTurnRadians,0,followMe.slowDownTurnAmount);
 
-        movementX *= Range.clip(Math.abs(allPoints.get(allPoints.size()-1).x-currentPosition.x)/0.787,0.5,1); // 0.787
-        movementY *= Range.clip(Math.abs(allPoints.get(allPoints.size()-1).y-currentPosition.y)/0.787,0.5,1);
+        if(pepega) {
+            movementX *= Range.clip(Math.abs(followMe.x-currentPosition.x)/0.8,0.5,1); // 0.787
+            movementY *= Range.clip(Math.abs(followMe.y-currentPosition.y)/0.8,0.5,1);
 
-        return clipedDistToFinalEnd < 1.181; //3
+        }
+
+        return clipedDistToFinalEnd < 4; //3
     }
 
 

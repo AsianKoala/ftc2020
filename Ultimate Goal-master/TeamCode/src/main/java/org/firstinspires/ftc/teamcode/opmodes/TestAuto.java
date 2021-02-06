@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import static org.firstinspires.ftc.teamcode.movement.Odometry.*;
 
 
-@Autonomous
+@Autonomous(name="test")
 public class TestAuto extends Auto {
 
 

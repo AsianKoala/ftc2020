@@ -52,8 +52,8 @@ public class Robot extends TunableOpMode {
         odometry = new Odometry(new Pose(0, 0, Math.toRadians(90)), odometrySet);
         initBNO055IMU(hardwareMap);
 
-        intake = new Intake(null, null);
-        shooter = new Shooter(null, null);
+//        intake = new Intake(null, null);
+//        shooter = new Shooter(null, null);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 
 import static org.firstinspires.ftc.teamcode.movement.Odometry.*;
 
-
+@Disabled
 @Autonomous(name="test")
 public class TestAuto extends Auto {
 

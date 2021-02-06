@@ -15,7 +15,7 @@ public class MainAuto extends Auto {
     public enum programStates {
         moveToPosition,
         initialShots,
-        turnForCollection,
+//        turnForCollection,
         collectRings,
         secondShots,
         placeMarker,
@@ -62,8 +62,8 @@ public class MainAuto extends Auto {
                 allPoints.add(new CurvePoint(15, -5, 0.6, 0.6, 20, 25, Math.toRadians(60), 0.7));
             }
 
-            allPoints.add(new CurvePoint(0, -10, 0.6, 0.6, 20, 25, Math.toRadians(60), 0.7));
-            boolean isDone = betterFollowCurve(allPoints, Math.toRadians(90), new Point(-12, 48), true);
+            allPoints.add(new CurvePoint(0, -12, 0.6, 0.6, 20, 25, Math.toRadians(60), 0.7));
+            boolean isDone = betterFollowCurve(allPoints, Math.toRadians(90), new Point(0, 48), true);
 
             if(isDone) {
                 stopMovement();
@@ -81,26 +81,27 @@ public class MainAuto extends Auto {
             // turn on intake and shoot
 
             if(timeCheck(3000)) {
-                nextStage();
-            }
-        }
-
-
-        if(progState == programStates.turnForCollection.ordinal()) {
-            if(stageFinished) {
                 if(ringAmount == RingDetectorPipeline.RingAmount.NONE) {
                     setStage(programStates.placeMarker.ordinal());
+                } else {
+                    nextStage();
                 }
-                initProgVars();
-            }
-
-            double d = pointPointTurn(new Point(0, 36), 0.5, Math.toRadians(40)).turnDelta_rad;
-
-            if(d < Math.toRadians(2)) {
-                stopMovement();
-                nextStage();
             }
         }
+//
+//
+//        if(progState == programStates.turnForCollection.ordinal()) {
+//            if(stageFinished) {
+//                initProgVars();
+//            }
+//
+//            double d = pointPointTurn(new Point(0, 36), 0.5, Math.toRadians(40)).turnDelta_rad;
+//
+//            if(d < Math.toRadians(2)) {
+//                stopMovement();
+//                nextStage();
+//            }
+//        }
 
 
         if(progState == programStates.collectRings.ordinal()) {
@@ -111,7 +112,7 @@ public class MainAuto extends Auto {
             ArrayList<CurvePoint> allPoints = new ArrayList<>();
             allPoints.add(initialCurvePoint());
             allPoints.add(new CurvePoint(0, -30, 0.3, 0.3, 10, 15, Math.toRadians(60), 0.6));
-            boolean done = betterFollowCurve(allPoints, Math.toRadians(90), new Point(5, 48), true);
+            boolean done = betterFollowCurve(allPoints, Math.toRadians(90), new Point(0, 48), true);
 
             if (done) {
                 stopMovement();
@@ -128,7 +129,7 @@ public class MainAuto extends Auto {
             ArrayList<CurvePoint> allPoints = new ArrayList<>();
             allPoints.add(initialCurvePoint());
             allPoints.add(new CurvePoint(0, -12, 0.6, 0.6, 10, 15, Math.toRadians(60), 0.4));
-            boolean done = betterFollowCurve(allPoints, Math.toRadians(90), new Point(-12, 72), true);
+            boolean done = betterFollowCurve(allPoints, Math.toRadians(90), new Point(0, 48), true);
 
             if(done) {
                 // start shooting
@@ -175,11 +176,14 @@ public class MainAuto extends Auto {
             if(stageFinished) {
                 initProgVars();
             }
-
             ArrayList<CurvePoint> allPoints = new ArrayList<>();
             allPoints.add(initialCurvePoint());
             allPoints.add(new CurvePoint(0, 12, 0.5, 0.5, 20, 25, Math.toRadians(30), 0.6));
             boolean done = betterFollowCurve(allPoints, Math.toRadians(90), null, false);
+
+            if(ringAmount == RingDetectorPipeline.RingAmount.NONE) {
+                done = true;
+            }
 
             if(done) {
                 stopMovement();

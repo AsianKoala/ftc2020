@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.movement;
 
 import org.firstinspires.ftc.teamcode.opmodes.Robot;
 import org.firstinspires.ftc.teamcode.util.MathUtil;
+import org.firstinspires.ftc.teamcode.util.Point;
 import org.firstinspires.ftc.teamcode.util.Pose;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,6 +38,11 @@ public class Odometry {
         startHeading = start.heading;
         prevHeading = startHeading;
         currentPosition = start;
+    }
+
+    // very very dangerous
+    public void setGlobalPosition(Point newPosition) {
+        currentPosition = new Pose(newPosition, currentPosition.heading);
     }
 
     public void update(double heading) {

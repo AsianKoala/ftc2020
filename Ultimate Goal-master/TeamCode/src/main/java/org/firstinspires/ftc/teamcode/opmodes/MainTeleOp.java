@@ -36,10 +36,14 @@ public class MainTeleOp extends Robot {
         super.loop();
         controlMovement();
         controlAnglePoint();
+
+        if(gamepad1.x) {
+            odometry.setGlobalPosition(new Point(0, 0));
+        }
     }
 
     public void controlMovement() {
-        double masterScale = 0.5 + ((gamepad1.right_bumper ? 1 : 0) * (1.0-0.5));
+        double masterScale = 0.5 + ((gamepad1.right_bumper ? 1 : 0) * 0.5);
         DriveTrain.movementY = -gamepad1.left_stick_y * masterScale;
         DriveTrain.movementX = gamepad1.left_stick_x * masterScale;
         DriveTrain.movementTurn = -gamepad1.right_stick_x * masterScale;

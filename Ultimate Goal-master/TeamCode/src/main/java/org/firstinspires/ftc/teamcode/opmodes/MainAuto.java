@@ -18,11 +18,7 @@ public class MainAuto extends Auto {
         turnForCollection,
         collectRings,
         secondShots,
-        stop,
         placeMarker,
-        goToSecondMarker,
-        pickUpMarker,
-        placeSecondMarker,
         park
     }
 
@@ -60,16 +56,22 @@ public class MainAuto extends Auto {
 
             ArrayList<CurvePoint> allPoints = new ArrayList<>();
             allPoints.add(initialCurvePoint());
-            allPoints.add(new CurvePoint(24, -15, 0.75, 0.75, 20, 25, Math.toRadians(60), 0.7));
-            allPoints.add(new CurvePoint(15, -5, 0.75, 0.75, 20, 25, Math.toRadians(60), 0.7));
-            allPoints.add(new CurvePoint(0, -10, 0.75, 0.75, 20, 25, Math.toRadians(60), 0.7));
+
+            if (ringAmount != RingDetectorPipeline.RingAmount.NONE) {
+                allPoints.add(new CurvePoint(24, -15, 0.6, 0.6, 20, 25, Math.toRadians(60), 0.7));
+                allPoints.add(new CurvePoint(15, -5, 0.6, 0.6, 20, 25, Math.toRadians(60), 0.7));
+            }
+
+            allPoints.add(new CurvePoint(0, -10, 0.6, 0.6, 20, 25, Math.toRadians(60), 0.7));
             boolean isDone = betterFollowCurve(allPoints, Math.toRadians(90), new Point(-12, 48), true);
 
             if(isDone) {
                 stopMovement();
+                odometry.setGlobalPosition(new Point(0, 0));
                 nextStage();
             }
         }
+
 
         if(progState == programStates.initialShots.ordinal()) {
             if(stageFinished) {
@@ -83,8 +85,12 @@ public class MainAuto extends Auto {
             }
         }
 
+
         if(progState == programStates.turnForCollection.ordinal()) {
             if(stageFinished) {
+                if(ringAmount == RingDetectorPipeline.RingAmount.NONE) {
+                    setStage(programStates.placeMarker.ordinal());
+                }
                 initProgVars();
             }
 
@@ -96,6 +102,7 @@ public class MainAuto extends Auto {
             }
         }
 
+
         if(progState == programStates.collectRings.ordinal()) {
             if (stageFinished) {
                 initProgVars();
@@ -104,7 +111,7 @@ public class MainAuto extends Auto {
             ArrayList<CurvePoint> allPoints = new ArrayList<>();
             allPoints.add(initialCurvePoint());
             allPoints.add(new CurvePoint(0, -30, 0.3, 0.3, 10, 15, Math.toRadians(60), 0.6));
-            boolean done = betterFollowCurve(allPoints, Math.toRadians(90), new Point(0, 48), true);
+            boolean done = betterFollowCurve(allPoints, Math.toRadians(90), new Point(5, 48), true);
 
             if (done) {
                 stopMovement();
@@ -120,7 +127,7 @@ public class MainAuto extends Auto {
 
             ArrayList<CurvePoint> allPoints = new ArrayList<>();
             allPoints.add(initialCurvePoint());
-            allPoints.add(new CurvePoint(0, 0, 0.4, 0.4, 10, 15, Math.toRadians(45), 0.4));
+            allPoints.add(new CurvePoint(0, -12, 0.6, 0.6, 10, 15, Math.toRadians(60), 0.4));
             boolean done = betterFollowCurve(allPoints, Math.toRadians(90), new Point(-12, 72), true);
 
             if(done) {
@@ -128,14 +135,58 @@ public class MainAuto extends Auto {
                 stopMovement();
             }
 
-            if(timeCheck(5000)) {
+            if(timeCheck(3000)) {
                 nextStage();
             }
         }
 
-        if(progState == programStates.stop.ordinal()) {
-            if(timeCheck(5000))
-                requestOpModeStop();
+
+        if(progState == programStates.placeMarker.ordinal()) {
+            if(stageFinished) {
+                initProgVars();
+            }
+
+            ArrayList<CurvePoint> allPoints = new ArrayList<>();
+            allPoints.add(initialCurvePoint());
+
+            switch(ringAmount) {
+                case NONE:
+                    allPoints.add(new CurvePoint(-12,12, 0.5, 0.5, 10, 15, Math.toRadians(45), 0.8));
+                    break;
+                case ONE:
+                    allPoints.add(new CurvePoint(0, 36, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
+                    break;
+                case FOUR:
+                    allPoints.add(new CurvePoint(-12, 60, 0.5, 0.5, 20, 25, Math.toRadians(60), 0.6));
+                    break;
+            }
+            boolean done = betterFollowCurve(allPoints, Math.toRadians(90), null, false);
+
+            if(done) {
+                stopMovement();
+                if(timeCheck(2000)) {
+                    nextStage();
+                }
+            }
         }
+
+
+        if(progState == programStates.park.ordinal()) {
+            if(stageFinished) {
+                initProgVars();
+            }
+
+            ArrayList<CurvePoint> allPoints = new ArrayList<>();
+            allPoints.add(initialCurvePoint());
+            allPoints.add(new CurvePoint(0, 12, 0.5, 0.5, 20, 25, Math.toRadians(30), 0.6));
+            boolean done = betterFollowCurve(allPoints, Math.toRadians(90), null, false);
+
+            if(done) {
+                stopMovement();
+                requestOpModeStop();
+            }
+        }
+
+
     }
 }

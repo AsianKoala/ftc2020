@@ -94,7 +94,6 @@ public abstract class Auto extends Robot {
     public void start() {
         super.start();
         ringAmount = pipeline.getRingAmount();
-
         progState = 0;
         completedStages = 0;
         stageFinished = true;
@@ -104,6 +103,8 @@ public abstract class Auto extends Robot {
     public void loop() {
         super.loop();
         MainStateMachine();
+
+        telemetry.addLine("Ring amount: " + ringAmount);
     }
 
     public abstract void MainStateMachine();

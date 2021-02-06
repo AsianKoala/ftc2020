@@ -414,19 +414,4 @@ public class PPController {
     }
 
 
-
-    public static ArrayList<CurvePoint> reversePath(ArrayList<CurvePoint> pathPoints, double xComp, double yComp) {
-        ArrayList<CurvePoint> allPoints = new ArrayList<>();
-        allPoints.add(new CurvePoint(currentPosition.x, currentPosition.y, 0, 0, 0, 0, 0, 0));
-
-        for(int i=pathPoints.size()-2; i>0; i--) {
-            allPoints.add(pathPoints.get(i));
-        }
-        CurvePoint lastPoint = new CurvePoint(pathPoints.get(0).x + xComp, pathPoints.get(0).y + yComp,
-                0.4, 0.6, 20, 15, Math.toRadians(30), 0.6);
-        allPoints.add(lastPoint);
-
-        return allPoints;
-    }
-
 }

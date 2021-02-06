@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.movement;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
 public class OdometrySet {
-    private ExpansionHubMotor vertical, horizontal;
+    private final ExpansionHubMotor vertical, horizontal;
     private int verticalOffset = 0;
     private int horizontalOffset = 0;
 

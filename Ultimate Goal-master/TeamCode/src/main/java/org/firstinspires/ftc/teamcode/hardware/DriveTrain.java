@@ -3,13 +3,14 @@ package org.firstinspires.ftc.teamcode.hardware;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.jetbrains.annotations.NotNull;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
 
 public class DriveTrain extends Hardware {
 
     public static double movementX, movementY, movementTurn;
-    private ExpansionHubMotor frontRight, frontLeft, backLeft, backRight;
+    private final ExpansionHubMotor frontRight, frontLeft, backLeft, backRight;
     private final ExpansionHubMotor[] motors;
 
     public DriveTrain(ExpansionHubMotor FL, ExpansionHubMotor FR, ExpansionHubMotor  BL, ExpansionHubMotor BR) {
@@ -60,6 +61,7 @@ public class DriveTrain extends Hardware {
         movementTurn = 0;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "movementX: " + movementX + " movementY: " + movementY + " movementTurn: " + movementTurn;

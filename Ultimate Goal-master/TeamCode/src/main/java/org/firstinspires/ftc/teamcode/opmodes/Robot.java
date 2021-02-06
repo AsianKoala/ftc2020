@@ -10,8 +10,6 @@ import net.frogbots.ftcopmodetunercommon.opmode.TunableOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.teamcode.hardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
-import org.firstinspires.ftc.teamcode.hardware.Intake;
-import org.firstinspires.ftc.teamcode.hardware.Shooter;
 import org.firstinspires.ftc.teamcode.movement.Odometry;
 import org.firstinspires.ftc.teamcode.movement.OdometrySet;
 import org.firstinspires.ftc.teamcode.util.AxesSigns;
@@ -25,8 +23,9 @@ import org.openftc.revextensions2.ExpansionHubMotor;
 public class Robot extends TunableOpMode {
 
     public DriveTrain driveTrain;
-    public Intake intake;
-    public Shooter shooter;
+//    public Intake intake;
+//    public Shooter shooter;
+//    public RingCirculatorThingIdk mover;
 
     // odom shit
     public Odometry odometry;

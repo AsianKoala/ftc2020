@@ -128,8 +128,8 @@ public class Odometry {
             Array2DRowRealMatrix inverseMatrix = new Array2DRowRealMatrix(3, 3);
 
             EncoderWheel[] WHEELS = {
-                    new EncoderWheel(0, PARALLEL_Y_POS, Math.toRadians(180), 0), // parallel
-                    new EncoderWheel(LATERAL_X_POS, 0, Math.toRadians(90), 1), // lateral
+                    new EncoderWheel(PARALLEL_X, PARALLEL_Y, Math.toRadians(180), 0), // parallel
+                    new EncoderWheel(PERPENDICULAR_X, PERPENDICULAR_Y, Math.toRadians(90), 1), // lateral
             };
 
             for (EncoderWheel wheelPosition : WHEELS) {

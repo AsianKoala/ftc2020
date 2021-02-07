@@ -17,7 +17,7 @@ public class MainTeleOp extends Robot {
     @Override
     public void init() {
         super.init();
-        odometry.setStart(new Pose(0, -63, Math.toRadians(180)));
+        odometry.setStart(new Pose(0, 0, 0));
         anglePoint = new Point(0,0);
     }
 

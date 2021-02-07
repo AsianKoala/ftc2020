@@ -17,7 +17,11 @@ public class Point {
         this.y = y;
     }
 
-
+    public Point rotated(double angle) {
+        double newX = x * Math.cos(angle) - y * Math.sin(angle);
+        double newY = x * Math.sin(angle) + y * Math.cos(angle);
+        return new Point(newX, newY);
+    }
 
     @SuppressLint("DefaultLocale")
     @NotNull

@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 
-public class MathUtil {
+public class
+MathUtil {
     public static final double EPSILON = 1e-6;
 
     public static double angleWrap(double angle){

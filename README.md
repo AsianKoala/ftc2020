@@ -1,8 +1,8 @@
-# <ins> SOCIALS </ins>
-
-mal: https://myanimelist.net/profile/asiank0ala
+# <ins> socials </ins>
 
 discord: asiank0ala#8008
+
+mal: https://myanimelist.net/profile/asiank0ala
 
 twitter: https://twitter.com/asiank0ala
 

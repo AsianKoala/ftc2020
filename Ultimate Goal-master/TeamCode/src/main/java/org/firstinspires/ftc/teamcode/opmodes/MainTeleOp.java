@@ -36,17 +36,13 @@ public class MainTeleOp extends Robot {
         super.loop();
         controlMovement();
         controlAnglePoint();
-
-        if(gamepad1.x) {
-            odometry.setGlobalPosition(new Point(0, 0));
-        }
     }
 
     public void controlMovement() {
-        double masterScale = 0.5 + ((gamepad1.right_bumper ? 1 : 0) * 0.5);
-        DriveTrain.movementY = -gamepad1.left_stick_y * masterScale;
-        DriveTrain.movementX = gamepad1.left_stick_x * masterScale;
-        DriveTrain.movementTurn = -gamepad1.right_stick_x * masterScale;
+        double driveScale = 0.5 + (gamepad1.right_bumper ? 0.5 : 0);
+        DriveTrain.movementY = -gamepad1.left_stick_y * driveScale;
+        DriveTrain.movementX = gamepad1.left_stick_x * driveScale;
+        DriveTrain.movementTurn = -gamepad1.right_stick_x * driveScale;
     }
 
     @SuppressLint("DefaultLocale")
@@ -68,10 +64,11 @@ public class MainTeleOp extends Robot {
             headingControlled = !headingControlled;
         }
 
+        telemetry.addLine("anglePoint: " + anglePoint.toString());
+
         if(headingControlled) {
             PPController.movementResult result = PPController.pointPointTurn(anglePoint, 0.6, Math.toRadians(30));
             telemetry.addLine(String.format("movementR: %.2f", Math.toDegrees(result.turnDelta_rad)));
-            telemetry.addLine("anglePoint: " + anglePoint.toString());
         }
     }
 }

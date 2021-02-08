@@ -70,7 +70,6 @@ public class Robot extends TunableOpMode {
     @Override
     public void loop() {
         Hardware.updateAllHardwareComponents();
-
         updateOdometryComponents();
     }
 

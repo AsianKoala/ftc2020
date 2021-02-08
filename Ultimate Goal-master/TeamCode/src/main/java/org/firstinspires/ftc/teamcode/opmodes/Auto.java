@@ -79,7 +79,6 @@ public abstract class Auto extends Robot {
                 phoneCam.startStreaming(320, 240, OpenCvCameraRotation.SIDEWAYS_LEFT);
             }
         });
-
     }
 
     @Override
@@ -103,7 +102,6 @@ public abstract class Auto extends Robot {
     public void loop() {
         super.loop();
         autoStateMachine();
-
         telemetry.addLine("Ring amount: " + ringAmount);
     }
 

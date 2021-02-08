@@ -1,4 +1,4 @@
-<ins> socials </ins>
+# <ins> SOCIALS </ins>
 
 mal: https://myanimelist.net/profile/asiank0ala
 

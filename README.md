@@ -1,4 +1,4 @@
-# <ins> socials </ins>
+# socials 
 
 discord: asiank0ala#8008
 

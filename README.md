@@ -8,4 +8,6 @@ twitter: https://twitter.com/asiank0ala
 
 osu: https://osu.ppy.sh/users/11534384
 
+twitch: twitch.tv/koawa
+
 feel free to add me on anything

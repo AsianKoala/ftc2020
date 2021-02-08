@@ -17,24 +17,11 @@ public class Pose extends Point implements Cloneable {
     }
 
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Pose pose = (Pose) o;
-        return MathUtil.approxEquals(pose.heading, heading);
-    }
 
     @NotNull
     @SuppressLint("DefaultLocale")
     @Override
     public String toString() {
         return String.format("{x: %.3f, y: %.3f, θ: %.3f}", x, y, Math.toDegrees(heading));
-    }
-
-    @Override
-    public Pose clone() {
-        return new Pose(x, y, heading);
     }
 }

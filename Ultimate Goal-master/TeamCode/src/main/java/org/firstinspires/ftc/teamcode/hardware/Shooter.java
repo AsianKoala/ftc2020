@@ -10,6 +10,8 @@ public class Shooter extends Hardware {
         this.leftShooter = leftShooter;
         this.rightShooter = rightShooter;
         rightShooter.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        Hardware.allHardwareComponents.add(this);
     }
 
     public void turnOn() {
@@ -30,7 +32,7 @@ public class Shooter extends Hardware {
     }
 
     @Override
-    void update() {
+    public void update() {
 
     }
 }

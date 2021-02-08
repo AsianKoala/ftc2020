@@ -18,15 +18,26 @@ MathUtil {
         return angle;
     }
 
-    public static boolean approxEquals(double d1, double d2) {
-        if (Double.isInfinite(d1)) {
-            // Infinity - infinity is NaN, so we need a special case
-            return d1 == d2;
-        } else {
-            return Math.abs(d1 - d2) < EPSILON;
-        }
-    }
 
+    public static Point clipToLine(double lineX1, double lineY1, double lineX2, double lineY2,
+                                   double robotX, double robotY){
+        if(lineX1 == lineX2){
+            lineX1 = lineX2 + 0.01;//nah
+        }
+        if(lineY1 == lineY2){
+            lineY1 = lineY2 + 0.01;//nah
+        }
+
+        //calculate the slope of the line
+        double m1 = (lineY2 - lineY1)/(lineX2 - lineX1);
+        //calculate the slope perpendicular to this line
+        double m2 = (lineX1 - lineX2)/(lineY2 - lineY1);
+
+        //clip the robot's position to be on the line
+        double xClipedToLine = ((-m2*robotX) + robotY + (m1 * lineX1) - lineY1)/(m1-m2);
+        double yClipedToLine = (m1 * (xClipedToLine - lineX1)) + lineY1;
+        return new Point(xClipedToLine,yClipedToLine);
+    }
 
     public static ArrayList<Point> lineCircleIntersection(double circleX, double circleY, double r,
                                                           double lineX1, double lineY1,

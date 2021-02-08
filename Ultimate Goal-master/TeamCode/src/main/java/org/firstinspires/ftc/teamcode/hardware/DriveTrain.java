@@ -9,6 +9,7 @@ import org.openftc.revextensions2.ExpansionHubMotor;
 
 public class DriveTrain extends Hardware {
 
+    // hahaha this setup is so fucked i just realized now that the motor array and the motorpower array dont match up
     public static double movementX, movementY, movementTurn;
     private final ExpansionHubMotor frontRight, frontLeft, backLeft, backRight;
     private final ExpansionHubMotor[] motors;
@@ -26,6 +27,8 @@ public class DriveTrain extends Hardware {
             motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
+
+        Hardware.allHardwareComponents.add(this);
     }
 
     private void applyMovement() {

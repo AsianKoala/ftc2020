@@ -10,6 +10,8 @@ public class Intake extends Hardware {
         this.leftIntake = leftIntake;
         this.rightIntake = rightIntake;
         rightIntake.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        Hardware.allHardwareComponents.add(this);
     }
 
     public void turnOn() {
@@ -30,7 +32,7 @@ public class Intake extends Hardware {
     }
 
     @Override
-    void update() {
+    public void update() {
 
     }
 }

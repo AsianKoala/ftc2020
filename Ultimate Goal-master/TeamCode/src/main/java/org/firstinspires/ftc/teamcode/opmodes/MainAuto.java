@@ -50,7 +50,7 @@ public class MainAuto extends Auto {
     }
 
     @Override
-    public void MainStateMachine() {
+    public void autoStateMachine() {
         if(progState == programStates.moveToPosition.ordinal()) {
             if(stageFinished) {
                 initProgVars();

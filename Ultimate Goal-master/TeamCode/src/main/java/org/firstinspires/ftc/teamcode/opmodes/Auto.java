@@ -102,12 +102,12 @@ public abstract class Auto extends Robot {
     @Override
     public void loop() {
         super.loop();
-        MainStateMachine();
+        autoStateMachine();
 
         telemetry.addLine("Ring amount: " + ringAmount);
     }
 
-    public abstract void MainStateMachine();
+    public abstract void autoStateMachine();
 
 
 

@@ -7,10 +7,6 @@ import org.jetbrains.annotations.NotNull;
 
 
 public class Odometry {
-    // 8192 ticks per revolution
-    // wheels are 60mm, or 2.3622 inches diameter
-    // 2.3622 * pi = 7.42107016631 circumference
-    // 8192 / 7.42107016631 = ticks per inch
     public static final double TICKS_PER_INCH = 1103.8839;
 
     private int prevVertical;

@@ -69,14 +69,17 @@ public class Robot extends TunableOpMode {
 
     @Override
     public void loop() {
-        driveTrain.update();
+        Hardware.updateAllHardwareComponents();
 
+        updateOdometryComponents();
+    }
+
+
+    private void updateOdometryComponents() {
         double lastHeading = imu.getAngularOrientation().firstAngle - headingOffset;
         odometry.update(MathUtil.angleWrap(lastHeading + Odometry.startHeading));
         telemetry.addLine(odometry.toString());
     }
-
-
 
     private void initBNO055IMU(HardwareMap hardwareMap) {
         imu = hardwareMap.get(BNO055IMUImpl.class, "imu");

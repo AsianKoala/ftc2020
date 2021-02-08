@@ -8,6 +8,8 @@ public class RingCirculatorThingIdk extends Hardware {
     ExpansionHubMotor mover;
     public RingCirculatorThingIdk(ExpansionHubMotor mover) {
         this.mover = mover;
+
+        Hardware.allHardwareComponents.add(this);
     }
 
     public void turnOn() {
@@ -26,7 +28,7 @@ public class RingCirculatorThingIdk extends Hardware {
         mover.setPower(Range.clip(power, -1, 1));
     }
     @Override
-    void update() {
+    public void update() {
 
     }
 }

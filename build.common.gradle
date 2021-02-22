@@ -100,6 +100,11 @@ android {
         jni.srcDirs = []
         jniLibs.srcDir rootProject.file('libs')
     }
+    
+    lintOptions {
+          abortOnError false
+    }
+
 }
 
 repositories {
